@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - Iniciar sesión</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #d1b085;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(209,176,133,0.08), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(209,176,133,0.10), transparent 30%),
+                  var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+    .card {
+      width: min(420px, 100%);
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(209,176,133,0.35), rgba(209,176,133,0.12));
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+    p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    form {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 15px;
+    }
+    input:focus {
+      outline: 2px solid rgba(209,176,133,0.45);
+      border-color: rgba(209,176,133,0.6);
+    }
+    button {
+      padding: 12px 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #d1b085, #b69267);
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(209,176,133,0.25); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .message {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fecdd3;
+      font-size: 14px;
+      display: none;
+    }
+    .message.success {
+      background: rgba(16,185,129,0.12);
+      border-color: rgba(16,185,129,0.35);
+      color: #bbf7d0;
+      display: block;
+    }
+    .message.error { display: block; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <div class="brand-mark">ÉS</div>
+      <div>
+        <h1>Panel de administración</h1>
+        <p>Accede con tus credenciales</p>
+      </div>
+    </div>
+
+    <div id="loginMessage" class="message"></div>
+
+    <form id="loginForm">
+      <div>
+        <label for="username">Usuario</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
+      </div>
+      <div>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="loginBtn">Iniciar sesión</button>
+    </form>
+  </main>
+
+  <script src="/js/admin-login.js"></script>
+</body>
+</html>

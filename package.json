@@ -1,0 +1,31 @@
+{
+  "name": "eclosion-des-sens",
+  "version": "1.0.0",
+  "description": "Sitio web completo para Éclosion des sens - Clínica de masajes",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "setup": "node src/config/init-db.js"
+  },
+  "keywords": [
+    "masajes",
+    "wellness",
+    "spa",
+    "eclosion-des-sens"
+  ],
+  "author": "Éclosion des sens",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.6.5",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

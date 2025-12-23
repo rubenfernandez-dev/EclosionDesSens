@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - Éclosion des sens</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1221;
+      --panel: #0f172a;
+      --card: #111827;
+      --stroke: rgba(255,255,255,0.05);
+      --accent: #d1b085;
+      --accent-2: #b69267;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(209,176,133,0.08), transparent 32%),
+                  radial-gradient(circle at 80% 0%, rgba(209,176,133,0.12), transparent 30%),
+                  var(--bg);
+      color: var(--text);
+      padding: 26px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 16px 18px;
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(209,176,133,0.35), rgba(209,176,133,0.12));
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: -0.4px; }
+    .sub { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+    button.btn {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0b1221;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    button.btn:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(209,176,133,0.25); }
+    button.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+    }
+    .card h2 { margin: 0 0 8px; font-size: 18px; }
+    .card p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: middle;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    select, input, textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 14px;
+    }
+    textarea { resize: vertical; min-height: 44px; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(209,176,133,0.16);
+      color: var(--accent);
+    }
+    .message {
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: none;
+      font-size: 14px;
+    }
+    .message.show { display: block; }
+    .message.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #bbf7d0; }
+    .message.error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fecdd3; }
+    form.inline-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+    .small { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    @media (max-width: 720px) {
+      body { padding: 16px; }
+      header { flex-direction: column; align-items: flex-start; }
+      table { display: block; overflow-x: auto; }
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      place-items: center;
+    }
+    .modal.show { display: grid; }
+    .modal-content {
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .modal h2 { margin: 0 0 12px; font-size: 20px; }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-mark">ÉS</div>
+      <div>
+        <h1>Panel de control</h1>
+        <p class="sub">Reservas y disponibilidad</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="userTag" class="tag">Cargando...</span>
+      <button class="btn" id="changePassBtn" type="button" title="Cambiar contraseña">🔑</button>
+      <button class="btn" id="logoutBtn" type="button">Salir</button>
+    </div>
+  </header>
+
+  <div id="panelMessage" class="message"></div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Reservas</h2>
+      <p>Actualiza estado, notas o elimina entradas.</p>
+      <div class="small">Recarga para ver cambios recientes.</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="reservasBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Disponibilidad</h2>
+      <p>Define horas por día (0=Domingo ... 6=Sábado).</p>
+      <form id="slotForm" class="inline-form">
+        <div>
+          <label for="dia_semana">Día</label>
+          <select id="dia_semana" name="dia_semana" required>
+            <option value="">Selecciona</option>
+            <option value="0">Domingo</option>
+            <option value="1">Lunes</option>
+            <option value="2">Martes</option>
+            <option value="3">Miércoles</option>
+            <option value="4">Jueves</option>
+            <option value="5">Viernes</option>
+            <option value="6">Sábado</option>
+          </select>
+        </div>
+        <div>
+          <label for="hora">Hora</label>
+          <input type="time" id="hora" name="hora" required>
+        </div>
+        <div>
+          <label for="disponible">Disponible</label>
+          <select id="disponible" name="disponible">
+            <option value="1">Sí</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Agregar</button>
+      </form>
+      <div style="overflow-x:auto; margin-top: 12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Hora</th>
+              <th>Disponible</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="disponibilidadBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="/js/admin-dashboard.js"></script>
+
+  <!-- Modal de cambio de contraseña -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closePasswordModal()">×</button>
+      <h2>Cambiar contraseña</h2>
+      <div id="passwordMessage" class="message"></div>
+      <form id="passwordForm" style="display: grid; gap: 12px; margin-top: 12px;">
+        <div>
+          <label for="currentPassword">Contraseña actual *</label>
+          <input type="password" id="currentPassword" name="currentPassword" required>
+        </div>
+        <div>
+          <label for="newPassword">Nueva contraseña *</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+        <div>
+          <label for="newPasswordConfirm">Confirmar nueva contraseña *</label>
+          <input type="password" id="newPasswordConfirm" name="newPasswordConfirm" required>
+        </div>
+        <button type="submit" class="btn">Actualizar contraseña</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

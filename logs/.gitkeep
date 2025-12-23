@@ -1,0 +1,9 @@
+# Directorio de Logs
+
+Este directorio contendrá los logs de la aplicación cuando se ejecute con PM2.
+
+Los archivos de log se crearán automáticamente:
+- `error.log` - Errores de la aplicación
+- `out.log` - Salida estándar de la aplicación
+
+Estos archivos no deben subirse al repositorio (están excluidos en .gitignore).

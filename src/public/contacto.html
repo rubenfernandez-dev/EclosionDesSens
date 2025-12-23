@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Éclosion des sens</title>
+    <meta name="description" content="Contáctanos para cualquier consulta. Estamos aquí para ayudarte.">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>Éclosion des sens</h1>
+                </div>
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="quienes-somos.html">Quiénes somos</a></li>
+                    <li><a href="galeria.html">Galería</a></li>
+                    <li><a href="reservas.html">Reservas</a></li>
+                    <li><a href="contacto.html" class="active">Contacto</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 class="page-title fade-in">Contacto</h1>
+            <p class="page-subtitle fade-in">Estamos aquí para ayudarte</p>
+        </div>
+    </section>
+
+    <!-- Contacto Section -->
+    <section class="contacto-section section">
+        <div class="container">
+            <div class="contacto-layout">
+                <!-- Formulario -->
+                <div class="contacto-form fade-in">
+                    <h2>Envíanos un Mensaje</h2>
+                    <p>Si tienes alguna pregunta o comentario, no dudes en contactarnos</p>
+
+                    <!-- Mensaje de respuesta -->
+                    <div id="contactoMessage" class="form-message" style="display: none;"></div>
+
+                    <form id="contactoForm" class="form">
+                        <div class="form-group">
+                            <label for="nombre">Nombre *</label>
+                            <input 
+                                type="text" 
+                                id="nombre" 
+                                name="nombre" 
+                                required 
+                                placeholder="Tu nombre"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                placeholder="tu@email.com"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mensaje">Mensaje *</label>
+                            <textarea 
+                                id="mensaje" 
+                                name="mensaje" 
+                                rows="6" 
+                                required 
+                                placeholder="Escribe tu mensaje aquí..."
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="contactoSubmitBtn">
+                                Enviar Mensaje
+                            </button>
+                        </div>
+
+                        <p class="form-note">* Campos obligatorios</p>
+                    </form>
+                </div>
+
+                <!-- Información de contacto -->
+                <div class="contacto-info fade-in">
+                    <div class="info-card">
+                        <h3>📞 Teléfono</h3>
+                        <p><a href="tel:+41765754559">+41 76 575 45 59</a></p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📧 Email</h3>
+                        <p><a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🌐 Web</h3>
+                        <p><a href="https://eclosiondessens.ch">eclosiondessens.ch</a></p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🕐 Horario de Atención</h3>
+                        <p><strong>Lunes a Viernes:</strong> 9:00 - 20:00</p>
+                        <p><strong>Sábados:</strong> 10:00 - 18:00</p>
+                        <p><strong>Domingos:</strong> Previa consulta</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>💬 Consultas Frecuentes</h3>
+                        <p>Respondemos todas las consultas en un plazo de 24 horas laborables.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mapa -->
+    <section class="mapa-section">
+        <div class="container">
+            <h2 class="section-title fade-in">Nuestra Ubicación</h2>
+            <div class="mapa-container fade-in">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d87187.02457294787!2d6.143157777441406!3d46.20416537934579!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478c6506b90e09d5%3A0x3ae89f4e8bb1cf38!2sGeneva%2C%20Switzerland!5e0!3m2!1sen!2sus!4v1703265887654!5m2!1sen!2sus" 
+                    width="100%" 
+                    height="400" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Mapa de ubicación - Geneva, Switzerland">
+                </iframe>
+            </div>
+            <p class="mapa-note">📍 Geneva, Switzerland - Ubicación aproximada</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Éclosion des sens</h3>
+                    <p>Tu espacio de relajación y bienestar en Suiza</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="quienes-somos.html">Quiénes somos</a></li>
+                        <li><a href="galeria.html">Galería</a></li>
+                        <li><a href="reservas.html">Reservas</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <ul class="footer-contact">
+                        <li>📞 <a href="tel:+41765754559">+41 76 575 45 59</a></li>
+                        <li>📧 <a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></li>
+                        <li>🌐 <a href="https://eclosiondessens.ch">eclosiondessens.ch</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">Facebook</a>
+                        <a href="#" aria-label="Instagram">Instagram</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
