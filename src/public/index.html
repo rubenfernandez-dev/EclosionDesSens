@@ -16,8 +16,7 @@
         <nav class="nav">
             <div class="nav-container">
                 <div class="logo">
-                    <img src="img/logo.blanco.jpg" alt="Logo Éclosion des sens" class="logo-image">
-                    
+                    <img src="img/logo.blanco.jpg" alt="Logo Éclosion des sens" class="logo-image">  
                 </div>
                 <button class="menu-toggle" id="menuToggle">
                     <span></span>
@@ -25,11 +24,11 @@
                     <span></span>
                 </button>
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="index.html" class="active">Inicio</a></li>
-                    <li><a href="quienes-somos.html">Quiénes somos</a></li>
-                    <li><a href="galeria.html">Galería</a></li>
-                    <li><a href="reservas.html">Reservas</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="index.html" class="active" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="quienes-somos.html" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                    <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                    <li><a href="reservas.html" data-i18n="nav.reservas">Reservas</a></li>
+                    <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                 </ul>
             </div>
         </nav>
@@ -41,22 +40,22 @@
             <div class="carousel-slide active">
                 <img src="/img/1.png" alt="Ambiente de relajación" loading="lazy">
                 <div class="carousel-caption">
-                    <h2>Relaja tu cuerpo</h2>
-                    <p>Descubre la paz interior</p>
+                    <h2 data-i18n="home.carousel.slide1_title">Relaja tu cuerpo</h2>
+                    <p data-i18n="home.carousel.slide1_text">Descubre la paz interior</p>
                 </div>
             </div>
             <div class="carousel-slide">
                 <img src="/img/room.png" alt="Masajes profesionales" loading="lazy">
                 <div class="carousel-caption">
-                    <h2>Despierta tus sentidos</h2>
-                    <p>Experiencia única de bienestar</p>
+                    <h2 data-i18n="home.carousel.slide2_title">Despierta tus sentidos</h2>
+                    <p data-i18n="home.carousel.slide2_text">Experiencia única de bienestar</p>
                 </div>
             </div>
             <div class="carousel-slide">
                 <img src="/img/2.png" alt="Espacio de tranquilidad" loading="lazy">
                 <div class="carousel-caption">
-                    <h2>Encuentra tu equilibrio</h2>
-                    <p>Momentos de pura serenidad</p>
+                    <h2 data-i18n="home.carousel.slide3_title">Encuentra tu equilibrio</h2>
+                    <p data-i18n="home.carousel.slide3_text">Momentos de pura serenidad</p>
                 </div>
             </div>
         </div>
@@ -70,13 +69,13 @@
         <div class="container">
             <div class="atencion-content">
                 <div class="atencion-text fade-in">
-                    <h2>Atención Profesional y Humana</h2>
-                    <p>Mi enfoque va más allá del masaje tradicional. Creo en el cuidado integral de la persona, donde cuerpo, mente y espíritu encuentran su equilibrio.</p>
-                    <p>Con años de formación especializada y una profunda pasión por el bienestar, cada sesión es una experiencia única diseñada para ti.</p>
-                    <p>Mi compromiso es ofrecerte un espacio seguro donde puedas desconectar del estrés diario y reconectar contigo mismo, sintiendo los beneficios tanto físicos como emocionales de un masaje profesional.</p>
+                    <h2 data-i18n="home.atencion_title">Atención Profesional y Humana</h2>
+                    <p data-i18n="home.atencion_text1">Mi enfoque va más allá del masaje tradicional. Creo en el cuidado integral de la persona, donde cuerpo, mente y espíritu encuentran su equilibrio.</p>
+                    <p data-i18n="home.atencion_text2">Con años de formación especializada y una profunda pasión por el bienestar, cada sesión es una experiencia única diseñada para ti.</p>
+                    <p data-i18n="home.atencion_text3">Mi compromiso es ofrecerte un espacio seguro donde puedas desconectar del estrés diario y reconectar contigo mismo, sintiendo los beneficios tanto físicos como emocionales de un masaje profesional.</p>
                     <div class="atencion-cta">
-                        <a href="reservas.html" class="btn btn-primary">Reserva tu cita</a>
-                        <a href="quienes-somos.html" class="btn btn-secondary">Conoce más</a>
+                        <a href="reservas.html" class="btn btn-primary" data-i18n="home.reserva_cita">Reserva tu cita</a>
+                        <a href="quienes-somos.html" class="btn btn-secondary" data-i18n="home.conoce_mas">Conoce más</a>
                     </div>
                 </div>
                 <div class="atencion-image fade-in">
@@ -88,56 +87,59 @@
     <!-- Servicios -->
     <section class="servicios section">
         <div class="container">
-            <h2 class="section-title">Nuestros Servicios</h2>
-            <p class="section-subtitle">Cada masaje es una experiencia única diseñada para tu bienestar</p>
+            <h2 class="section-title" data-i18n="home.servicios_title">Nuestros Servicios</h2>
+            <p class="section-subtitle" data-i18n="home.servicios_subtitle">Cada masaje es una experiencia única diseñada para tu bienestar</p>
             
             <div class="servicios-grid">
                 <div class="servicio-card fade-in">
                     <div class="servicio-icon">🌿</div>
-                    <h3>Masaje Relajante Clásico</h3>
-                    <p>Técnicas suaves que liberan tensiones y proporcionan una profunda relajación corporal y mental.</p>
+                    <h3 data-i18n="home.masaje_relajante">Masaje Relajante</h3>
+                    <p data-i18n="home.masaje_relajante_desc">Desconéctate del estrés y relájate en un ambiente tranquilo</p>
                     <div class="servicio-duration">60 min / 90 min</div>
                 </div>
                 
                 <div class="servicio-card fade-in">
                     <div class="servicio-icon">💆</div>
-                    <h3>Masaje Deportivo</h3>
-                    <p>Tratamiento profundo para aliviar contracturas musculares y mejorar la movilidad.</p>
+                    <h3 data-i18n="home.masaje_deportivo">Masaje Deportivo</h3>
+                    <p data-i18n="home.masaje_deportivo_desc">Recuperación y prevención de lesiones con técnicas especializadas</p>
                     <div class="servicio-duration">60 min / 90 min</div>
                 </div>
                 
                 <div class="servicio-card fade-in">
                     <div class="servicio-icon">🕉️</div>
-                    <h3>Masaje Aromático con Aceites Naturales</h3>
-                    <p>Combina el poder de aceites esenciales con técnicas relajantes para equilibrar cuerpo y mente.</p>
+                    <h3 data-i18n="home.masaje_terapeutico">Masaje Terapéutico</h3>
+                    <p data-i18n="home.masaje_terapeutico_desc">Alivio del dolor y tensión muscular profunda</p>
                     <div class="servicio-duration">75 min</div>
-                </div>
-                
-                <div class="servicio-card fade-in">
-                    <div class="servicio-icon">✨</div>
-                    <h3>Aceite de Árnica</h3>
-                    <p>Conocido por innumerables Propiedades para el alivio muscular y la regeneración de tejidos y más.</p>
-                    <div class="servicio-duration">90 min</div>
                 </div>
             </div>
 
             <!-- Subsección Aceites -->
             <div class="aceites-section">
-                <h3 class="aceites-title">Aceites de Alta Calidad</h3>
+                <h3 class="aceites-title" data-i18n="home.aceites_title">Aceites de Alta Calidad</h3>
                 <div class="aceites-content">
-                    <p>Utilizamos únicamente aceites naturales y esenciales de primera calidad, cuidadosamente seleccionados por sus propiedades terapéuticas y relajantes.</p>
-                        <h4> Aceite de Árnica:</h4><br>
-                    
+                    <p data-i18n="home.aceites_intro">Utilizamos únicamente aceites naturales y esenciales de primera calidad, cuidadosamente seleccionados por sus propiedades terapéuticas y relajantes.</p>
                     <div class="aceites-beneficios">
                         <div class="aceite-item">
-                            <strong> Principales efectos:</strong>
-                                    Antiinflamatorio y analgésico: Alivia el dolor y la hinchazón causados ​​por hematomas, esguinces y afecciones reumáticas. 
+                            <h4 class="aceite-heading" data-i18n="home.aceite_arnica">Aceite de Árnica:</h4>
+                            <p class="aceite-detail" data-i18n="home.aceite_arnica_desc">Propiedades antiinflamatorias y descontracturantes</p>
+                            <p class="aceite-detail" data-i18n="home.aceite_arnica_texto">Alivia el dolor y la hinchazón causados por hematomas, esguinces y afecciones reumáticas.</p>
                         </div>
                         <div class="aceite-item">
-                            <strong>Es bueno para: </strong> Favorece la circulación sanguínea y activa: Estimula la circulación sanguínea, lo que ayuda con la tensión muscular, el dolor muscular y como medida preventiva antes del ejercicio. 
+                            <strong data-i18n="home.aceite_bueno_para">Es bueno para:</strong>
+                            <ul class="aceite-list">
+                                <li data-i18n="home.aceite_bueno_item1">Aplicar inmediatamente tras golpes, heridas o contusiones para reducir moretones y acelerar la cicatrización.</li>
+                                <li data-i18n="home.aceite_bueno_item2">Reduce inflamaciones causadas por golpes y accidentes.</li>
+                                <li data-i18n="home.aceite_bueno_item3">Alivia dolores de espalda, lumbares, cervicales, musculares y articulares.</li>
+                            </ul>
                         </div>
                         <div class="aceite-item">
-                            <strong>Importante:</strong> Favorece la cicatrización y regeneración de heridas: Favorece la cicatrización de los tejidos después de traumatismos contundentes y promueve la regeneración de la piel.
+                            <strong data-i18n="home.aceite_importante">Importante:</strong>
+                            <ul class="aceite-list">
+                                <li data-i18n="home.aceite_importante_item1">No aplicar sobre heridas abiertas ni mucosas.</li>
+                                <li data-i18n="home.aceite_importante_item2">Ideal como cuidado después de la depilación.</li>
+                                <li data-i18n="home.aceite_importante_item3">Evitar usar antes de exponerse al sol.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,50 +149,59 @@
     <!-- Por qué elegirme -->
     <section class="por-que section section-alt">
         <div class="container">
-            <h2 class="section-title">Por Qué Elegirme</h2>
+            <h2 class="section-title" data-i18n="home.por_que_title">¿Por Qué Elegirme?</h2>
             <p class="section-subtitle">Compromiso absoluto con tu bienestar</p>
             
             <div class="razones-grid">
                 <div class="razon-card fade-in">
                     <div class="razon-icon">👤</div>
-                    <h3>Trato Personalizado</h3>
-                    <p>Cada sesión se adapta a tus necesidades específicas y preferencias personales.</p>
+                    <h3 data-i18n="home.experiencia">Experiencia</h3>
+                    <p data-i18n="home.experiencia_desc">Más de 20 años de profesionalismo en el cuidado del bienestar</p>
                 </div>
                 
                 <div class="razon-card fade-in">
                     <div class="razon-icon">🏠</div>
-                    <h3>Ambiente Íntimo</h3>
-                    <p>Espacio privado, cálido y acogedor diseñado para tu máxima comodidad.</p>
+                    <h3 data-i18n="home.calidad">Calidad</h3>
+                    <p data-i18n="home.calidad_desc">Aceites biológicos y artesanales cuidadosamente seleccionados</p>
                 </div>
                 
                 <div class="razon-card fade-in">
                     <div class="razon-icon">🎓</div>
-                    <h3>Experiencia Profesional</h3>
-                    <p>Formación certificada y más de 15 años de experiencia en técnicas de masaje terapéutico.</p>
-                </div>
-                
-                <div class="razon-card fade-in">
-                    <div class="razon-icon">⭐</div>
-                    <h3>Productos Premium</h3>
-                    <p>Solo utilizamos productos naturales de la más alta calidad para tu Bienestar.</p>
-                </div>
-                
-                <div class="razon-card fade-in">
-                    <div class="razon-icon">💆</div>
-                    <h3>Seguimiento</h3>
-                    <p>Estudiamos tu progreso y adaptamos los tratamientos para maximizar los beneficios.</p>
-                </div>
-                
-                <div class="razon-card fade-in">
-                    <div class="razon-icon">💚</div>
-                    <h3>Pasión y Dedicación</h3>
-                    <p>Cada masaje se realiza con amor, respeto y absoluta profesionalidad.</p>
+                    <h3 data-i18n="home.ambiente">Ambiente</h3>
+                    <p data-i18n="home.ambiente_desc">Espacio tranquilo, seguro y acogedor para tu relajación</p>
                 </div>
             </div>
         </div>
     </section>
 
-    
+    <!-- Contacto Home -->
+    <section class="mapa-section section">
+        <div class="container">
+            <div class="contacto-home">
+                <div class="contacto-home-text">
+                    <h2 class="section-title" data-i18n="home.contacto_title">Visítanos en Espace Famaïa</h2>
+                    <p class="section-subtitle" data-i18n="home.contacto_subtitle">Un espacio cálido y acogedor en St-Blaise para tu bienestar.</p>
+                    <p class="contacto-home-address">
+                        <strong data-i18n="home.contacto_direccion">Dirección:</strong>
+                        <span data-i18n="home.contacto_direccion_detalle">Éclosion des Sens, c/o Espace Famaïa, Av. des Pâquiers 22, 2072 St-Blaise</span>
+                    </p>
+                </div>
+                <div class="mapa-container">
+                    <h3 class="mapa-heading" data-i18n="home.contacto_mapa_title">Cómo llegar</h3>
+                    <iframe 
+                        src="https://www.google.com/maps?q=Av.%20des%20P%C3%A2quiers%2022%2C%202072%20St-Blaise&output=embed" 
+                        width="100%" 
+                        height="400" 
+                        class="mapa-iframe"
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Mapa de ubicación - Espace Famaïa, Yverdon-les-Bains">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
@@ -198,22 +209,22 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Éclosion des sens</h3>
-                    <p>Tu espacio de relajación y bienestar en Suiza</p>
+                    <p data-i18n="footer.description">Tu espacio de relajación y bienestar en Suiza</p>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Enlaces Rápidos</h4>
+                    <h4 data-i18n="footer.quick_links">Enlaces Rápidos</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html">Inicio</a></li>
-                        <li><a href="quienes-somos.html">Quiénes somos</a></li>
-                        <li><a href="galeria.html">Galería</a></li>
-                        <li><a href="reservas.html">Reservas</a></li>
-                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="index.html" data-i18n="nav.inicio">Inicio</a></li>
+                        <li><a href="quienes-somos.html" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                        <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                        <li><a href="reservas.html" data-i18n="nav.reservas">Reservas</a></li>
+                        <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Contacto</h4>
+                    <h4 data-i18n="footer.contacto_title">Contacto</h4>
                     <ul class="footer-contact">
                         <li>📞 <a href="tel:+41765754559">+41 76 575 45 59</a></li>
                         <li>📧 <a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></li>
@@ -222,20 +233,21 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Síguenos</h4>
+                    <h4 data-i18n="footer.siguenos_title">Síguenos</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook">Facebook</a>
-                        <a href="#" aria-label="Instagram">Instagram</a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span aria-hidden="true">📘</span> Facebook</a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span aria-hidden="true">📷</span> Instagram</a>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</p>
+                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span></p>
             </div>
         </div>
     </footer>
 
+    <script src="/js/language-manager.js"></script>
     <script src="/js/script.js"></script>
 </body>
 </html>

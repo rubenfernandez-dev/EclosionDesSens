@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiénes Somos - Éclosion des sens</title>
-    <meta name="description" content="Conoce la filosofía y el equipo detrás de Éclosion des sens. Profesionales dedicados a tu bienestar.">
+    <meta name="description"
+        content="Conoce la filosofía y el equipo detrás de Éclosion des sens. Profesionales dedicados a tu bienestar.">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <nav class="nav">
             <div class="nav-container">
                 <div class="logo">
-                    <h1>Éclosion des sens</h1>
+                    <img src="img/logo.blanco.jpg" alt="Logo Éclosion des sens" class="logo-image">
                 </div>
                 <button class="menu-toggle" id="menuToggle">
                     <span></span>
@@ -24,11 +29,11 @@
                     <span></span>
                 </button>
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="quienes-somos.html" class="active">Quiénes somos</a></li>
-                    <li><a href="galeria.html">Galería</a></li>
-                    <li><a href="reservas.html">Reservas</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="index.html" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="quienes-somos.html" class="active" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                    <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                    <li><a href="reservas.html" data-i18n="nav.reservas">Reservas</a></li>
+                    <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                 </ul>
             </div>
         </nav>
@@ -37,8 +42,8 @@
     <!-- Hero Section -->
     <section class="page-hero">
         <div class="container">
-            <h1 class="page-title fade-in">Quiénes Somos</h1>
-            <p class="page-subtitle fade-in">Conoce nuestra filosofía y pasión por el bienestar</p>
+            <h1 class="page-title fade-in" data-i18n="about.page_title">Quiénes Somos</h1>
+            <p class="page-subtitle fade-in" data-i18n="about.page_subtitle">Conoce nuestra filosofía y pasión por el bienestar</p>
         </div>
     </section>
 
@@ -48,33 +53,53 @@
             <div class="about-layout">
                 <!-- Columna de texto -->
                 <div class="about-text fade-in">
-                    <h2>Nuestra Filosofía</h2>
-                    <p>En Éclosion des sens creemos que el bienestar es un viaje hacia el equilibrio perfecto entre cuerpo, mente y espíritu. Nuestro enfoque se basa en la escucha activa y el respeto profundo hacia cada persona que confía en nosotros.</p>
-                    
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-
-                    <h3>Nuestro Compromiso</h3>
-                    <p>Cada masaje es una experiencia única, personalizada y adaptada a tus necesidades específicas. Combinamos técnicas tradicionales con enfoques modernos para ofrecerte el mejor cuidado posible.</p>
-                    
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+                    <h1 data-i18n="about.nombre">Ariane Gardi</h1>
+                    <p data-i18n="about.intro">
+                        Titular de un diploma en educación social y activa en este ámbito desde hace 20 años, he
+                        trabajado en diversas instituciones dedicadas al acompañamiento de adolescentes y adultos en
+                        Suiza Romanda.
+                    </p>
+                    <p data-i18n="about.pasion">Desde muy joven me ha apasionado el bienestar que proporciona el tacto, y con el deseo de
+                        perfeccionarme en el ámbito del masaje terapéutico, seguí una formación en la escuela de masaje
+                        Isana en masaje clásico y deportivo en 2019.
+                    </p>
+                    <p data-i18n="about.filosofia">El tacto está en el corazón del masaje: favorece la relajación, el bienestar, la reducción del
+                        dolor y crea una conexión humana basada en la confianza, con efectos terapéuticos profundamente
+                        beneficiosos.
+                    </p>
+                    <p data-i18n="about.oferta">Ofrezco diferentes tipos de masajes relajantes y terapéuticos, utilizando aceites biológicos y
+                        artesanales de alta calidad, que permiten desconectar, aliviar tensiones y disfrutar plenamente
+                        del momento.
+                    </p>
+                    <p data-i18n="about.consultorio">Después de compartir un espacio en un gabinete terapéutico, en 2025 decidí abrir mi propio
+                        consultorio de masajes dentro de un espacio pluridisciplinario: Espace Famaïa.
+                    </p>
+                    <h3 data-i18n="about.aceites_subtitle">Bienestar, relajación y aceites biológicos</h3>
+                    <p data-i18n="about.aceites_intro">
+                        En mi práctica de masaje, utilizo aceites biológicos y artesanales cuidadosamente seleccionados
+                        por sus beneficios terapéuticos. Entre ellos destaca el aceite de árnica, conocido por sus
+                        propiedades antiinflamatorias, descontracturantes y analgésicas, ideal para aliviar tensiones
+                        musculares, reducir molestias y favorecer una recuperación natural del cuerpo. Este aceite
+                        potencia los efectos del masaje y contribuye a una sensación profunda de bienestar.
+                    </p>
 
                     <div class="about-values">
                         <div class="value-item">
-                            <strong>Profesionalidad:</strong> Formación continua y certificada en técnicas de masaje.
+                            <strong data-i18n="about.valores_profesionalidad">Profesionalidad:</strong> <span data-i18n="about.valores_profesionalidad_desc">Formación continua y certificada en técnicas de masaje.</span>
                         </div>
                         <div class="value-item">
-                            <strong>Confidencialidad:</strong> Tu privacidad y comodidad son nuestra prioridad.
+                            <strong data-i18n="about.valores_confidencialidad">Confidencialidad:</strong> <span data-i18n="about.valores_confidencialidad_desc">Tu privacidad y comodidad son nuestra prioridad.</span>
                         </div>
                         <div class="value-item">
-                            <strong>Calidad:</strong> Solo utilizamos productos premium y naturales.
+                            <strong data-i18n="about.valores_calidad">Calidad:</strong> <span data-i18n="about.valores_calidad_desc">Solo utilizamos productos premium y naturales.</span>
                         </div>
                         <div class="value-item">
-                            <strong>Pasión:</strong> Amor genuino por ayudar a las personas a sentirse mejor.
+                            <strong data-i18n="about.valores_pasion">Pasión:</strong> <span data-i18n="about.valores_pasion_desc">Amor genuino por ayudar a las personas a sentirse mejor.</span>
                         </div>
                     </div>
 
                     <div class="about-cta">
-                        <a href="reservas.html" class="btn btn-primary">Agenda tu cita</a>
+                        <a href="reservas.html" class="btn btn-primary" data-i18n="about.cta_reserva">Agenda tu cita</a>
                     </div>
                 </div>
 
@@ -83,7 +108,9 @@
                     <div class="image-wrapper">
                         <img src="/img/arianne2.png" alt="Ariane Gardi Profesional de masajes" loading="lazy">
                         <div class="image-overlay">
-                            <p>"El cuidado de tu bienestar es mi pasión y compromiso"</p>
+                        </div><br>
+                        <img src="/img/logo.negro.jpg" alt="Ariane Gardi Profesional de masajes" loading="lazy">
+                        <div class="image-overlay">
                         </div>
                     </div>
                 </div>
@@ -94,22 +121,22 @@
     <!-- Sección Extra: Experiencia -->
     <section class="experiencia section section-alt">
         <div class="container">
-            <h2 class="section-title">Formación y Experiencia</h2>
+            <h2 class="section-title" data-i18n="about.formacion_title">Formación y Experiencia</h2>
             <div class="experiencia-grid">
                 <div class="exp-card fade-in">
-                    <div class="exp-number">15+</div>
-                    <h3>Años de Experiencia</h3>
-                    <p>Ayudando a personas a encontrar su equilibrio y bienestar</p>
+                    <div class="exp-number">18+</div>
+                    <h3 data-i18n="about.exp_anos">Años de Experiencia</h3>
+                    <p data-i18n="about.exp_anos_desc">Ayudando a personas a encontrar su equilibrio y bienestar</p>
                 </div>
                 <div class="exp-card fade-in">
                     <div class="exp-number">500+</div>
-                    <h3>Clientes Satisfechos</h3>
-                    <p>Experiencias únicas y resultados comprobados</p>
+                    <h3 data-i18n="about.exp_clientes">Clientes Satisfechos</h3>
+                    <p data-i18n="about.exp_clientes_desc">Experiencias únicas y resultados comprobados</p>
                 </div>
                 <div class="exp-card fade-in">
                     <div class="exp-number">10+</div>
-                    <h3>Técnicas Especializadas</h3>
-                    <p>Amplio repertorio para cada necesidad</p>
+                    <h3 data-i18n="about.exp_tecnicas">Técnicas Especializadas</h3>
+                    <p data-i18n="about.exp_tecnicas_desc">Amplio repertorio para cada necesidad</p>
                 </div>
             </div>
         </div>
@@ -121,44 +148,46 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Éclosion des sens</h3>
-                    <p>Tu espacio de relajación y bienestar en Suiza</p>
+                    <p data-i18n="footer.description">Tu espacio de relajación y bienestar en Suiza</p>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Enlaces Rápidos</h4>
+                    <h4 data-i18n="footer.quick_links">Enlaces Rápidos</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html">Inicio</a></li>
-                        <li><a href="quienes-somos.html">Quiénes somos</a></li>
-                        <li><a href="galeria.html">Galería</a></li>
-                        <li><a href="reservas.html">Reservas</a></li>
-                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="index.html" data-i18n="nav.inicio">Inicio</a></li>
+                        <li><a href="quienes-somos.html" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                        <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                        <li><a href="reservas.html" data-i18n="nav.reservas">Reservas</a></li>
+                        <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Contacto</h4>
+                    <h4 data-i18n="footer.contacto_title">Contacto</h4>
                     <ul class="footer-contact">
                         <li>📞 <a href="tel:+41765754559">+41 76 575 45 59</a></li>
                         <li>📧 <a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></li>
                         <li>🌐 <a href="https://eclosiondessens.ch">eclosiondessens.ch</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Síguenos</h4>
+                    <h4 data-i18n="footer.siguenos_title">Síguenos</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook">Facebook</a>
-                        <a href="#" aria-label="Instagram">Instagram</a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span aria-hidden="true">📘</span> Facebook</a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span aria-hidden="true">📷</span> Instagram</a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>&copy; 2024 Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</p>
+                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span></p>
             </div>
         </div>
     </footer>
 
+    <script src="/js/language-manager.js"></script>
     <script src="/js/script.js"></script>
 </body>
+
 </html>

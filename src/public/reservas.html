@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +9,17 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <nav class="nav">
             <div class="nav-container">
                 <div class="logo">
-                    <h1>Éclosion des sens</h1>
+                    <img src="img/logo.blanco.jpg" alt="Logo Éclosion des sens" class="logo-image">
                 </div>
                 <button class="menu-toggle" id="menuToggle">
                     <span></span>
@@ -24,11 +27,11 @@
                     <span></span>
                 </button>
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="quienes-somos.html">Quiénes somos</a></li>
-                    <li><a href="galeria.html">Galería</a></li>
-                    <li><a href="reservas.html" class="active">Reservas</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="index.html" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="quienes-somos.html" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                    <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                    <li><a href="reservas.html" class="active" data-i18n="nav.reservas">Reservas</a></li>
+                    <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                 </ul>
             </div>
         </nav>
@@ -37,8 +40,9 @@
     <!-- Hero Section -->
     <section class="page-hero">
         <div class="container">
-            <h1 class="page-title fade-in">Reserva tu Cita</h1>
-            <p class="page-subtitle fade-in">Tu momento de relajación está a un paso</p>
+            <h1 class="page-title fade-in" data-i18n="reservas.page_title">Reserva tu Cita</h1>
+            <p class="page-subtitle fade-in" data-i18n="reservas.page_subtitle">Tu momento de relajación está a un paso
+            </p>
         </div>
     </section>
 
@@ -47,125 +51,110 @@
         <div class="container">
             <div class="form-container fade-in">
                 <div class="form-intro">
-                    <h2>Agenda tu Masaje</h2>
-                    <p>Completa el formulario y te confirmaremos tu reserva lo antes posible</p>
+                    <h2 data-i18n="reservas.agenda_title">Agenda tu Masaje</h2>
+                    <p data-i18n="reservas.formulario_descripcion">Completa el formulario y te confirmaremos tu reserva
+                        lo antes posible</p>
                 </div>
 
                 <!-- Mensaje de respuesta -->
-                <div id="reservaMessage" class="form-message" style="display: none;"></div>
+                <div id="reservaMessage" class="form-message hidden"></div>
 
                 <form id="reservaForm" class="form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="nombre">Nombre completo *</label>
-                            <input 
-                                type="text" 
-                                id="nombre" 
-                                name="nombre" 
-                                required 
-                                placeholder="Tu nombre completo"
-                            >
+                            <label for="nombre" data-i18n="reservas.nombre_label">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo"
+                                data-i18n-placeholder="reservas.nombre_placeholder">
                         </div>
 
                         <div class="form-group">
-                            <label for="telefono">Teléfono *</label>
-                            <input 
-                                type="tel" 
-                                id="telefono" 
-                                name="telefono" 
-                                required 
-                                placeholder="+41 XX XXX XX XX"
-                            >
+                            <label for="telefono" data-i18n="reservas.telefono_label">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" required placeholder="+41 XX XXX XX XX"
+                                data-i18n-placeholder="reservas.telefono_placeholder">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            required 
-                            placeholder="tu@email.com"
-                        >
+                        <label for="email" data-i18n="reservas.email_label">Email *</label>
+                        <input type="email" id="email" name="email" required placeholder="tu@email.com"
+                            data-i18n-placeholder="reservas.email_placeholder">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="fecha_reserva">Fecha de la reserva *</label>
-                            <input 
-                                type="date" 
-                                id="fecha_reserva" 
-                                name="fecha_reserva" 
-                                required
-                            >
+                            <label for="fecha_reserva" data-i18n="reservas.fecha_label">Fecha de la reserva *</label>
+                            <input type="date" id="fecha_reserva" name="fecha_reserva" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="hora_reserva">Hora de la reserva *</label>
-                            <input 
-                                type="time" 
-                                id="hora_reserva" 
-                                name="hora_reserva" 
-                                required
-                            >
+                            <label for="hora_reserva" data-i18n="reservas.hora_label">Hora de la reserva *</label>
+                            <input type="time" id="hora_reserva" name="hora_reserva" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="tipo_masaje">Tipo de masaje *</label>
+                        <label for="tipo_masaje" data-i18n="reservas.tipo_label">Tipo de masaje *</label>
                         <select id="tipo_masaje" name="tipo_masaje" required>
-                            <option value="">Selecciona un tipo de masaje</option>
-                            <option value="Masaje Clásico Completo (75 min)">Masaje Clásico completo (75 min) 80 CHF</option>
-                            <option value="Masaje Clásico Piernas Glúteos (30 min)">Masaje Clásico Piernas Glúteos (30 min) 50 CHF</option>
-                            <option value="Masaje Clásico Espalda Nuca (45 min)">Masaje Clásico Piernas Glúteos (45 min) 60 CHF</option>
-                            <option value="Masaje Deportivo Piernas Glúteos(Recuperación) (45 min)">Masaje Deportivo Recuperación Piernas Glúteos + Aceite de Árnica (45 min) 60 CHF</option>
-                            <option value="Masaje Deportivo Espalda Nuca(Recuperación) (60 min)">Masaje Deportivo Recuperación Espalda Nuca + Aceite de Árnica (60 min) 80 CHF</option>
-                            <option value="Masaje Deportivo Completo(Recuperación) (90 min)">Masaje Deportivo Recuperación Completo + Aceite de Árnica (90 min) 110 CHF</option>
+                            <option value="" data-i18n="reservas.selecciona_masaje">Selecciona un tipo de masaje
+                            </option>
+                            <option value="Masaje Clásico Completo (75 min)">Masaje Clásico completo (75 min) 80 CHF
+                            </option>
+                            <option value="Masaje Clásico Piernas Glúteos (30 min)">Masaje Clásico Piernas Glúteos (30
+                                min) 50 CHF</option>
+                            <option value="Masaje Clásico Espalda Nuca (45 min)">Masaje Clásico Piernas Glúteos (45 min)
+                                60 CHF</option>
+                            <option value="Masaje Deportivo Piernas Glúteos(Recuperación) (45 min)">Masaje Deportivo
+                                Recuperación Piernas Glúteos + Aceite de Árnica (45 min) 60 CHF</option>
+                            <option value="Masaje Deportivo Espalda Nuca(Recuperación) (60 min)">Masaje Deportivo
+                                Recuperación Espalda Nuca + Aceite de Árnica (60 min) 80 CHF</option>
+                            <option value="Masaje Deportivo Completo(Recuperación) (90 min)">Masaje Deportivo
+                                Recuperación Completo + Aceite de Árnica (90 min) 110 CHF</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="mensaje">Mensaje adicional (opcional)</label>
-                        <textarea 
-                            id="mensaje" 
-                            name="mensaje" 
-                            rows="4" 
+                        <label for="mensaje" data-i18n="reservas.notas_label">Mensaje adicional (opcional)</label>
+                        <textarea id="mensaje" name="mensaje" rows="4"
                             placeholder="Alguna solicitud especial o comentario..."
-                        ></textarea>
+                            data-i18n-placeholder="reservas.notas_placeholder"></textarea>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="privacidad" name="privacidad" required>
+                        <label for="privacidad" class="checkbox-label" data-i18n="reservas.privacidad_label">Acepto la política de privacidad y protección de datos</label>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <button type="submit" class="btn btn-primary" id="submitBtn" data-i18n="reservas.reservar_btn">
                             Enviar Reserva
                         </button>
                     </div>
 
-                    <p class="form-note">* Campos obligatorios</p>
+                    <p class="form-note" data-i18n="reservas.campos_obligatorios">* Campos obligatorios</p>
                 </form>
             </div>
 
             <!-- Información adicional -->
             <div class="reservas-info fade-in">
                 <div class="info-card">
-                    <h3>📅 Horarios de Atención</h3>
-                    <p>Lunes a Viernes: 9:00 - 20:00</p>
-                    <p>Sábados: 10:00 - 18:00</p>
-                    <p>Domingos: Previa consulta</p>
+                    <h3 data-i18n="reservas.disponibilidad_title">📅 Horarios de Atención</h3>
+                    <p data-i18n="reservas.lunes_viernes">Lunes a Viernes: 9:00 - 20:00</p>
+                    <p data-i18n="reservas.sabado">Sábados: 10:00 - 18:00</p>
+                    <p data-i18n="reservas.domingo">Domingos: Previa consulta</p>
                 </div>
 
                 <div class="info-card">
-                    <h3>💡 Información Importante</h3>
+                    <h3 data-i18n="reservas.info_importante_title">💡 Información Importante</h3>
                     <ul>
-                        <li>Confirmaremos tu reserva por email y teléfono</li>
-                        <li>Por favor, llega 5 minutos antes de tu cita</li>
-                        <li>Cancelaciones con 24h de anticipación</li>
+                        <li data-i18n="reservas.info_confirmacion">Confirmaremos tu reserva por email y teléfono</li>
+                        <li data-i18n="reservas.info_anticipacion">Por favor, llega 5 minutos antes de tu cita</li>
+                        <li data-i18n="reservas.info_cancelacion">Cancelaciones con 24h de anticipación</li>
                     </ul>
                 </div>
 
                 <div class="info-card">
-                    <h3>📞 ¿Prefieres llamar?</h3>
-                    <p>Contacta directamente:</p>
+                    <h3 data-i18n="reservas.llamar_title">📞 ¿Prefieres llamar?</h3>
+                    <p data-i18n="reservas.llamar_texto">Contacta directamente:</p>
                     <p><strong><a href="tel:+41765754559">+41 76 575 45 59</a></strong></p>
                 </div>
             </div>
@@ -178,44 +167,46 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Éclosion des sens</h3>
-                    <p>Tu espacio de relajación y bienestar en Suiza</p>
+                    <p data-i18n="footer.description">Tu espacio de relajación y bienestar en Suiza</p>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Enlaces Rápidos</h4>
+                    <h4 data-i18n="footer.quick_links">Enlaces Rápidos</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html">Inicio</a></li>
-                        <li><a href="quienes-somos.html">Quiénes somos</a></li>
-                        <li><a href="galeria.html">Galería</a></li>
-                        <li><a href="reservas.html">Reservas</a></li>
-                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="index.html" data-i18n="nav.inicio">Inicio</a></li>
+                        <li><a href="quienes-somos.html" data-i18n="nav.quienes-somos">Quiénes somos</a></li>
+                        <li><a href="galeria.html" data-i18n="nav.galeria">Galería</a></li>
+                        <li><a href="reservas.html" data-i18n="nav.reservas">Reservas</a></li>
+                        <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Contacto</h4>
+                    <h4 data-i18n="footer.contacto_title">Contacto</h4>
                     <ul class="footer-contact">
                         <li>📞 <a href="tel:+41765754559">+41 76 575 45 59</a></li>
                         <li>📧 <a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></li>
                         <li>🌐 <a href="https://eclosiondessens.ch">eclosiondessens.ch</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
-                    <h4>Síguenos</h4>
+                    <h4 data-i18n="footer.siguenos_title">Síguenos</h4>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook">Facebook</a>
-                        <a href="#" aria-label="Instagram">Instagram</a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span aria-hidden="true">📘</span> Facebook</a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span aria-hidden="true">📷</span> Instagram</a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>&copy; 2024 Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</p>
+                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span></p>
             </div>
         </div>
     </footer>
 
+    <script src="/js/language-manager.js"></script>
     <script src="/js/script.js"></script>
 </body>
+
 </html>

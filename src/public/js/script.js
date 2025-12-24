@@ -506,6 +506,14 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // ========================================
+// FOOTER YEAR
+// ========================================
+const footerYearEl = document.getElementById('footerYear');
+if (footerYearEl) {
+  footerYearEl.textContent = `© ${new Date().getFullYear()}`;
+}
+
+// ========================================
 // CONSOLE LOG
 // ========================================
 console.log('%c🌿 Éclosion des sens', 'color: #8b7355; font-size: 20px; font-weight: bold;');
