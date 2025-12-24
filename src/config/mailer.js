@@ -68,7 +68,7 @@ async function enviarConfirmacionReservaCliente(reserva) {
               <li><span class="highlight">Tipo de masaje:</span> ${reserva.tipo_masaje}</li>
             </ul>
             ${reserva.mensaje ? `<p><span class="highlight">Tu mensaje:</span> ${reserva.mensaje}</p>` : ''}
-            <p>Te confirmaremos la reserva pronto. Si tienes alguna duda, no dudes en contactarnos.</p>
+            <p>La reserva está confirmada. Si tienes alguna duda, no dudes en contactarnos.</p>
             <p>Esperamos verte pronto y brindarte un momento de relajación absoluta.</p>
           </div>
           <div class="footer">
