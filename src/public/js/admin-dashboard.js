@@ -14,7 +14,10 @@ function showMessage(text, type = 'success') {
 }
 
 async function fetchJson(url, options = {}) {
-  const res = await fetch(url, options);
+  const res = await fetch(url, {
+    ...options,
+    credentials: "include" // 🔥 OBLIGATORIO
+  });
   if (res.status === 401) {
     window.location.href = '/admin/login.html';
     return null;
