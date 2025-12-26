@@ -1,6 +1,8 @@
 async function checkSession() {
   try {
-    const res = await fetch('/api/admin/me');
+    const res = await fetch('/api/admin/me', {
+      credentials: "include" // 🔥 OBLIGATORIO
+    });
     const data = await res.json();
     if (data.success) {
       window.location.href = '/admin/dashboard';
@@ -30,6 +32,7 @@ async function handleLogin(event) {
     const res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: "include", // 🔥 OBLIGATORIO
       body: JSON.stringify({ username, password })
     });
 
