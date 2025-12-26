@@ -3,7 +3,7 @@ async function checkSession() {
     const res = await fetch('/api/admin/me');
     const data = await res.json();
     if (data.success) {
-      window.location.href = '/admin/dashboard.html';
+      window.location.href = '/admin/dashboard';
     }
   } catch (err) {
     // Ignorar
@@ -36,7 +36,7 @@ async function handleLogin(event) {
     const data = await res.json();
     if (data.success) {
       showMessage('Acceso concedido, redirigiendo...', 'success');
-      setTimeout(() => { window.location.href = '/admin/dashboard.html'; }, 400);
+      setTimeout(() => { window.location.href = '/admin/dashboard'; }, 400);
     } else {
       showMessage(data.message || 'Credenciales inválidas', 'error');
     }

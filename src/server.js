@@ -30,6 +30,26 @@ app.use(session({
 // Servir archivos estáticos desde la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ========================================
+// RUTAS LIMPIAS PARA PANEL ADMIN
+// ========================================
+// /admin → redirige a /admin/dashboard
+app.get('/admin', (req, res) => {
+  res.redirect('/admin/dashboard');
+});
+
+// /admin/login → sirve login.html
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/login.html'));
+});
+
+// /admin/dashboard → sirve dashboard.html (con verificación de sesión)
+app.get('/admin/dashboard', (req, res) => {
+  // Nota: La verificación de sesión se realiza en el lado del cliente con JavaScript
+  // o en las rutas /api/admin si necesitas protección en backend
+  res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
+});
+
 // Importar rutas
 const reservasRoutes = require('./routes/reservas');
 const contactoRoutes = require('./routes/contacto');
