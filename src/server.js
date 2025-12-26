@@ -10,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const isProd = process.env.NODE_ENV === 'production';
 
+app.set("trust proxy", 1);
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
