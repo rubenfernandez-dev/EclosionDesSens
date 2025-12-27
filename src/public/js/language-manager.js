@@ -2,7 +2,7 @@
 class LanguageManager {
   constructor() {
     this.translations = {};
-    this.currentLanguage = this.getStoredLanguage() || 'es';
+    this.currentLanguage = this.getStoredLanguage() || 'fr';
     this.supportedLanguages = ['es', 'fr', 'de'];
     this.init();
   }
