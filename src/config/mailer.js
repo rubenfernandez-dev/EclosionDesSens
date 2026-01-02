@@ -86,6 +86,7 @@ transporter.verify((error, success) => {
  * Enviar confirmación de reserva al cliente
  */
 async function enviarConfirmacionReservaCliente(reserva) {
+  console.log('📧 Enviando email de confirmación en idioma:', reserva.idioma);
   const t = (key) => getTranslation(reserva.idioma, key);
   const mailOptions = {
     from: process.env.EMAIL_FROM,
