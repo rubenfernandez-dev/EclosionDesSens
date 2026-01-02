@@ -2,6 +2,66 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
 
+// Traducciones para emails
+const emailTranslations = {
+  es: {
+    confirmacion_titulo: '¡Gracias por tu reserva, {nombre}!',
+    confirmacion_subtitulo: 'Hemos recibido tu solicitud de reserva. A continuación, los detalles:',
+    fecha: 'Fecha',
+    hora: 'Hora',
+    tipo_masaje: 'Tipo de masaje',
+    tu_mensaje: 'Tu mensaje',
+    estado_confirmada: 'La reserva está confirmada',
+    duda_contacta: 'Si tienes alguna duda, no dudes en contactarnos.',
+    esperamos_pronto: 'Esperamos verte pronto y brindarte un momento de relajación absoluta.',
+    empresa_nueva_reserva: 'Nueva Reserva Recibida',
+    cliente: 'Cliente',
+    telefono: 'Teléfono',
+    email: 'Email',
+    mensaje: 'Mensaje',
+    registrada_el: 'Reserva registrada el'
+  },
+  fr: {
+    confirmacion_titulo: 'Merci pour votre réservation, {nombre}!',
+    confirmacion_subtitulo: 'Nous avons reçu votre demande de réservation. Voici les détails:',
+    fecha: 'Date',
+    hora: 'Heure',
+    tipo_masaje: 'Type de massage',
+    tu_mensaje: 'Votre message',
+    estado_confirmada: 'La réservation est confirmée',
+    duda_contacta: 'Si vous avez des questions, n\'hésitez pas à nous contacter.',
+    esperamos_pronto: 'Nous vous attendons bientôt pour vous offrir un moment de détente absolue.',
+    empresa_nueva_reserva: 'Nouvelle Réservation Reçue',
+    cliente: 'Client',
+    telefono: 'Téléphone',
+    email: 'Email',
+    mensaje: 'Message',
+    registrada_el: 'Réservation reçue le'
+  },
+  de: {
+    confirmacion_titulo: 'Danke für Ihre Reservierung, {nombre}!',
+    confirmacion_subtitulo: 'Wir haben Ihre Reservierungsanfrage erhalten. Hier sind die Details:',
+    fecha: 'Datum',
+    hora: 'Uhrzeit',
+    tipo_masaje: 'Massageart',
+    tu_mensaje: 'Ihre Nachricht',
+    estado_confirmada: 'Die Reservierung ist bestätigt',
+    duda_contacta: 'Bei Fragen zögern Sie nicht, uns zu kontaktieren.',
+    esperamos_pronto: 'Wir freuen uns, Sie bald zu sehen und Ihnen einen Moment absoluter Entspannung zu schenken.',
+    empresa_nueva_reserva: 'Neue Reservierung Eingegangen',
+    cliente: 'Kunde',
+    telefono: 'Telefon',
+    email: 'Email',
+    mensaje: 'Nachricht',
+    registrada_el: 'Reservierung erhalten am'
+  }
+};
+
+function getTranslation(idioma, key) {
+  const lang = idioma && emailTranslations[idioma] ? idioma : 'fr';
+  return emailTranslations[lang][key] || emailTranslations.fr[key];
+}
+
 // Configurar transportador de correo
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -26,10 +86,13 @@ transporter.verify((error, success) => {
  * Enviar confirmación de reserva al cliente
  */
 async function enviarConfirmacionReservaCliente(reserva) {
+  const t = (key) => getTranslation(reserva.idioma, key);
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: reserva.email,
-    subject: 'Confirmación de tu reserva - Éclosion des sens',
+    subject: reserva.idioma === 'de' ? 'Reservierungsbestätigung - Éclosion des sens' : 
+             reserva.idioma === 'fr' ? 'Confirmation de votre réservation - Éclosion des sens' : 
+             'Confirmación de tu reserva - Éclosion des sens',
     attachments: [
       {
         filename: 'logo.blanco.jpg',
@@ -60,16 +123,16 @@ async function enviarConfirmacionReservaCliente(reserva) {
             <h1>Éclosion des sens</h1>
           </div>
           <div class="content">
-            <h2>¡Gracias por tu reserva, ${reserva.nombre}!</h2>
-            <p>Hemos recibido tu solicitud de reserva. A continuación, los detalles:</p>
+            <h2>${t('confirmacion_titulo').replace('{nombre}', reserva.nombre)}</h2>
+            <p>${t('confirmacion_subtitulo')}</p>
             <ul>
-              <li><span class="highlight">Fecha:</span> ${reserva.fecha_reserva}</li>
-              <li><span class="highlight">Hora:</span> ${reserva.hora_reserva}</li>
-              <li><span class="highlight">Tipo de masaje:</span> ${reserva.tipo_masaje}</li>
+              <li><span class="highlight">${t('fecha')}:</span> ${reserva.fecha_reserva}</li>
+              <li><span class="highlight">${t('hora')}:</span> ${reserva.hora_reserva}</li>
+              <li><span class="highlight">${t('tipo_masaje')}:</span> ${reserva.tipo_masaje}</li>
             </ul>
-            ${reserva.mensaje ? `<p><span class="highlight">Tu mensaje:</span> ${reserva.mensaje}</p>` : ''}
-            <p>La reserva está confirmada. Si tienes alguna duda, no dudes en contactarnos.</p>
-            <p>Esperamos verte pronto y brindarte un momento de relajación absoluta.</p>
+            ${reserva.mensaje ? `<p><span class="highlight">${t('tu_mensaje')}:</span> ${reserva.mensaje}</p>` : ''}
+            <p>${t('estado_confirmada')}. ${t('duda_contacta')}</p>
+            <p>${t('esperamos_pronto')}</p>
           </div>
           <div class="footer">
             <p><strong>Éclosion des sens</strong><br>
@@ -90,10 +153,13 @@ async function enviarConfirmacionReservaCliente(reserva) {
  * Notificar a la empresa sobre nueva reserva
  */
 async function enviarNotificacionReservaEmpresa(reserva) {
+  const t = (key) => getTranslation(reserva.idioma, key);
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: process.env.EMAIL_EMPRESA,
-    subject: '🔔 Nueva reserva recibida - Éclosion des sens',
+    subject: reserva.idioma === 'de' ? '🔔 Neue Reservierung eingegangen - Éclosion des sens' : 
+             reserva.idioma === 'fr' ? '🔔 Nouvelle réservation reçue - Éclosion des sens' : 
+             '🔔 Nueva reserva recibida - Éclosion des sens',
     attachments: [
       {
         filename: 'logo.blanco.jpg',

@@ -12,7 +12,7 @@ const {
  */
 router.post('/', async (req, res) => {
   try {
-    const { nombre, telefono, email, fecha_reserva, hora_reserva, tipo_masaje, mensaje } = req.body;
+    const { nombre, telefono, email, fecha_reserva, hora_reserva, tipo_masaje, mensaje, idioma } = req.body;
 
     // Validación de campos obligatorios
     if (!nombre || !telefono || !email || !fecha_reserva || !hora_reserva || !tipo_masaje) {
@@ -56,7 +56,8 @@ router.post('/', async (req, res) => {
       fecha_reserva,
       hora_reserva,
       tipo_masaje,
-      mensaje
+      mensaje,
+      idioma: idioma || 'fr'
     };
 
     // Enviar correos electrónicos

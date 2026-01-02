@@ -242,7 +242,8 @@ if (reservaForm) {
       fecha_reserva: document.getElementById('fecha_reserva').value,
       hora_reserva: document.getElementById('hora_reserva').value,
       tipo_masaje: document.getElementById('tipo_masaje').value,
-      mensaje: document.getElementById('mensaje').value.trim()
+      mensaje: document.getElementById('mensaje').value.trim(),
+      idioma: languageManager ? languageManager.currentLanguage : 'fr'
     };
 
     // Validación del lado del cliente
