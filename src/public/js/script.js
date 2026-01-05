@@ -515,7 +515,23 @@ if (footerYearEl) {
 }
 
 // ========================================
-// CONSOLE LOG
+// FAQ ACCORDION
 // ========================================
-console.log('%c🌿 Éclosion des sens', 'color: #8b7355; font-size: 20px; font-weight: bold;');
-console.log('%cSitio web desarrollado con amor y dedicación', 'color: #8a7a6a; font-size: 12px;');
+function toggleFaq(button) {
+  const answer = button.nextElementSibling;
+  const isActive = button.classList.contains('active');
+  
+  // Cerrar todos los otros FAQs
+  document.querySelectorAll('.faq-question').forEach(q => {
+    if (q !== button) {
+      q.classList.remove('active');
+      q.nextElementSibling.classList.remove('active');
+    }
+  });
+  
+  // Toggle el actual
+  button.classList.toggle('active');
+  answer.classList.toggle('active');
+}
+
+// ========================================

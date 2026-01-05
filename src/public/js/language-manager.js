@@ -17,7 +17,13 @@ class LanguageManager {
 
   async init() {
     try {
-      const response = await fetch('/js/translations.json');
+      let response = await fetch('/js/translations.json');
+
+      // Fallback en caso de rutas relativas (p.ej. servidor estático en subcarpeta)
+      if (!response.ok) {
+        response = await fetch('./js/translations.json');
+      }
+
       this.translations = await response.json();
       this.applyLanguage(this.currentLanguage);
       this.setupLanguageSelector();
@@ -92,26 +98,43 @@ class LanguageManager {
   applyLanguage(lang) {
     document.documentElement.lang = lang;
 
+    const setText = (element, translation) => {
+      if (translation === undefined || translation === null) return;
+
+      const tag = element.tagName;
+
+      // Inputs y textareas: prioriza placeholder
+      if (tag === 'INPUT' || tag === 'TEXTAREA') {
+        if (element.hasAttribute('data-i18n-placeholder') || element.placeholder) {
+          element.placeholder = translation;
+        } else {
+          element.value = translation;
+        }
+        return;
+      }
+
+      // Botones (button o input type button/submit/reset)
+      if (tag === 'BUTTON' || (tag === 'INPUT' && (element.type === 'button' || element.type === 'submit' || element.type === 'reset'))) {
+        element.textContent = translation;
+        return;
+      }
+
+      // Cualquier otro nodo de texto
+      element.textContent = translation;
+    };
+
     // Traducir elementos con data-i18n
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.dataset.i18n;
       const translation = this.get(key);
-      if (translation) {
-        if (element.tagName === 'INPUT' && element.type === 'placeholder') {
-          element.placeholder = translation;
-        } else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-          element.placeholder = translation;
-        } else {
-          element.textContent = translation;
-        }
-      }
+      setText(element, translation);
     });
 
     // Traducir placeholders con data-i18n-placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
       const key = element.dataset.i18nPlaceholder;
       const translation = this.get(key);
-      if (translation) {
+      if (translation !== undefined && translation !== null) {
         element.placeholder = translation;
       }
     });
@@ -120,9 +143,18 @@ class LanguageManager {
     document.querySelectorAll('[data-i18n-attr]').forEach(element => {
       const attrKey = element.dataset.i18nAttr;
       const translation = this.get(attrKey);
-      if (translation) {
+      if (translation !== undefined && translation !== null) {
         const attr = element.dataset.i18nAttrName || 'title';
         element.setAttribute(attr, translation);
+      }
+    });
+
+    // Traducir HTML completo (por si se necesitan etiquetas internas)
+    document.querySelectorAll('[data-i18n-html]').forEach(element => {
+      const key = element.dataset.i18nHtml;
+      const translation = this.get(key);
+      if (translation !== undefined && translation !== null) {
+        element.innerHTML = translation;
       }
     });
   }
