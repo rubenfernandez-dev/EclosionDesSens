@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,11 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Nunito:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -50,7 +54,8 @@
                 <!-- Formulario -->
                 <div class="contacto-form fade-in">
                     <h2 data-i18n="contacto.formulario_title">Envíanos un Mensaje</h2>
-                    <p data-i18n="contacto.formulario_descripcion">Si tienes alguna pregunta o comentario, no dudes en contactarnos</p>
+                    <p data-i18n="contacto.formulario_descripcion">Si tienes alguna pregunta o comentario, no dudes en
+                        contactarnos</p>
 
                     <!-- Mensaje de respuesta -->
                     <div id="contactoMessage" class="form-message hidden"></div>
@@ -58,55 +63,42 @@
                     <form id="contactoForm" class="form">
                         <div class="form-group">
                             <label for="nombre" data-i18n="contacto.nombre_label">Nombre *</label>
-                            <input 
-                                type="text" 
-                                id="nombre" 
-                                name="nombre" 
-                                required 
-                                placeholder="Tu nombre"
-                                data-i18n-placeholder="contacto.nombre_placeholder"
-                            >
+                            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre"
+                                data-i18n-placeholder="contacto.nombre_placeholder">
                         </div>
 
                         <div class="form-group">
                             <label for="email" data-i18n="contacto.email_label">Email *</label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                required 
-                                placeholder="tu@email.com"
-                                data-i18n-placeholder="contacto.email_placeholder"
-                            >
+                            <input type="email" id="email" name="email" required placeholder="tu@email.com"
+                                data-i18n-placeholder="contacto.email_placeholder">
                         </div>
 
                         <div class="form-group">
                             <label for="mensaje" data-i18n="contacto.mensaje_label">Mensaje *</label>
-                            <textarea 
-                                id="mensaje" 
-                                name="mensaje" 
-                                rows="6" 
-                                required 
+                            <textarea id="mensaje" name="mensaje" rows="6" required
                                 placeholder="Escribe tu mensaje aquí..."
-                                data-i18n-placeholder="contacto.mensaje_placeholder"
-                            ></textarea>
+                                data-i18n-placeholder="contacto.mensaje_placeholder"></textarea>
                         </div>
 
                         <div class="form-group checkbox-group">
                             <input type="checkbox" id="privacidad" name="privacidad" required>
                             <label for="privacidad" class="checkbox-label">
-                                <span data-i18n="contacto.privacidad_label">Acepto la política de privacidad y protección de datos</span>
-                                <a href="politique-confidentialite.html" target="_blank" style="color: var(--color-primary); text-decoration: underline; margin-left: 4px;">(voir la politique)</a>
+                                <span data-i18n="contacto.privacidad_label">Acepto la política de privacidad y
+                                    protección de datos</span>
+                                <a href="politique-confidentialite.html" target="_blank"
+                                    style="color: var(--color-primary); text-decoration: underline; margin-left: 4px;">(voir
+                                    la politique)</a>
                             </label>
                         </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary" id="contactoSubmitBtn" data-i18n="contacto.enviar_btn">
+                            <button type="submit" class="btn btn-primary" id="contactoSubmitBtn"
+                                data-i18n="contacto.enviar_btn">
                                 Enviar Mensaje
                             </button>
                         </div>
 
-                        <p class="form-note">* Campos obligatorios</p>
+                        <p class="form-note" data-i18n="contacto.form-note">* Campos obligatorios</p>
                     </form>
                 </div>
 
@@ -135,7 +127,8 @@
 
                     <div class="info-card">
                         <h3>💬 <span data-i18n="contacto.consultas_title">Consultas Frecuentes</span></h3>
-                        <p data-i18n="contacto.consultas_texto">Respondemos todas las consultas en un plazo de 24 horas laborables.</p>
+                        <p data-i18n="contacto.consultas_texto">Respondemos todas las consultas en un plazo de 24 horas
+                            laborables.</p>
                     </div>
                 </div>
             </div>
@@ -147,18 +140,19 @@
         <div class="container">
             <h2 class="section-title fade-in" data-i18n="contacto.mapa_title">Nuestra Ubicación</h2>
             <div class="mapa-container fade-in">
-                <iframe 
-                    src="https://www.google.com/maps?q=Av.%20des%20P%C3%A2quiers%2022%2C%202072%20St-Blaise&output=embed" 
-                    width="100%" 
-                    height="400" 
-                    class="mapa-iframe"
-                    allowfullscreen="" 
-                    loading="lazy" 
+                <iframe
+                    src="https://www.google.com/maps?q=Av.%20des%20P%C3%A2quiers%2022%2C%202072%20St-Blaise&output=embed"
+                    width="100%" height="400" class="mapa-iframe" allowfullscreen="" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"
                     title="Mapa de ubicación - Av. des Pâquiers 22, 2072 St-Blaise">
                 </iframe>
             </div>
-            <p class="mapa-note">📍 Av. des Pâquiers 22, 2072 St-Blaise</p>
+            <p class="mapa-note"><strong data-i18n="home.contacto_direccion">Dirección:</strong>
+                <span data-i18n="home.contacto_direccion_detalle">Éclosion des Sens, c/o Espace Famaïa, Av. des Pâquiers 22, 2072 St-Blaise</span><br>
+                <strong data-i18n="home.contacto_direccion_aparcar">¿Dónde aparcar?</strong><br>
+                <span data-i18n="home.contacto_direccion_indicacion">Hay plazas de aparcamiento gratuitas fuera de
+                    Manor. Llegar en autobús: bus 107, parada champs-montants, bus 101, parada indiennes.</span>
+            </p>
         </div>
     </section>
 
@@ -170,7 +164,7 @@
                     <h3>Éclosion des sens</h3>
                     <p data-i18n="footer.description">Tu espacio de relajación y bienestar en Suiza</p>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4 data-i18n="footer.quick_links">Enlaces Rápidos</h4>
                     <ul class="footer-links">
@@ -182,29 +176,36 @@
                         <li><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4 data-i18n="footer.contacto_title">Contacto</h4>
                     <ul class="footer-contact">
                         <li>📞 <a href="tel:+41765754559">+41 76 575 45 59</a></li>
                         <li>📧 <a href="mailto:info@eclosiondessens.ch">info@eclosiondessens.ch</a></li>
                         <li>🌐 <a href="https://eclosiondessens.ch">eclosiondessens.ch</a></li>
-                        <li>📍<a href="https://eclosiondessens.ch/contacto.html">"Av. des Pâquiers 22, 2072 St-Blaise"</a></li>
+                        <li>📍<a href="https://eclosiondessens.ch/contacto.html">"Av. des Pâquiers 22, 2072
+                                St-Blaise"</a></li>
 
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4 data-i18n="footer.siguenos_title">Síguenos</h4>
                     <div class="social-links">
-                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span aria-hidden="true">📘</span> Facebook</a>
-                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span aria-hidden="true">📷</span> Instagram</a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Facebook"><span aria-hidden="true">📘</span> Facebook</a>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Instagram"><span aria-hidden="true">📷</span> Instagram</a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span> | <a href="politique-confidentialite.html" style="color: var(--color-beige); text-decoration: underline;">Politique de confidentialité</a></p>
+                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens -
+                        eclosiondessens.ch. Todos los derechos reservados.</span> | <a
+                        href="politique-confidentialite.html"
+                        style="color: var(--color-beige); text-decoration: underline;">Politique de confidentialité</a>
+                </p>
             </div>
         </div>
     </footer>
@@ -212,4 +213,5 @@
     <script src="/js/language-manager.js"></script>
     <script src="/js/script.js"></script>
 </body>
+
 </html>

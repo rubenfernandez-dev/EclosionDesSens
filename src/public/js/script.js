@@ -535,3 +535,31 @@ function toggleFaq(button) {
 }
 
 // ========================================
+// BOTÓN WHATSAPP FIJO
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const existingButton = document.querySelector('.whatsapp-button');
+  if (existingButton) return;
+
+  const whatsappLink = document.createElement('a');
+  whatsappLink.href = 'https://wa.me/41765754559?text=Hola%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n';
+  whatsappLink.target = '_blank';
+  whatsappLink.rel = 'noopener noreferrer';
+  whatsappLink.className = 'whatsapp-button';
+  whatsappLink.setAttribute('aria-label', 'Contactar por WhatsApp');
+  whatsappLink.setAttribute('data-i18n-attr', 'whatsapp.tooltip');
+  whatsappLink.title = 'Escríbenos por WhatsApp';
+
+  whatsappLink.innerHTML = `
+    <span class="whatsapp-icon" aria-hidden="true">☏</span>
+    <span class="whatsapp-text" data-i18n="whatsapp.cta">WhatsApp</span>
+  `;
+
+  document.body.appendChild(whatsappLink);
+
+  if (typeof languageManager !== 'undefined' && languageManager) {
+    languageManager.applyLanguage(languageManager.currentLanguage);
+  }
+});
+
+// ========================================
