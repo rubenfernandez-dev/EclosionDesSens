@@ -31,6 +31,9 @@ app.use(session({
 // Servir archivos estáticos desde la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Servir favicon desde la raíz del proyecto
+app.use(express.static(path.join(__dirname, '..')));
+
 // ========================================
 // RUTAS LIMPIAS PARA PANEL ADMIN
 // ========================================
