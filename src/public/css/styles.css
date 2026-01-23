@@ -490,12 +490,39 @@ h4 { font-size: 1.25rem; }
   }
 
   .servicio-image {
-    min-height: 280px;
-    max-height: 280px;
+    min-height: 250px;
+    max-height: 250px;
   }
 
   .servicio-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+
+    .servicio-content h3 {
+      font-size: 1.5rem;
+    }
+
+    .servicio-description p {
+      font-size: 0.95rem;
+
+    @media (max-width: 480px) {
+      .servicio-image {
+        min-height: 200px;
+        max-height: 200px;
+      }
+
+      .servicio-content {
+        padding: var(--spacing-sm);
+      }
+
+      .servicio-content h3 {
+        font-size: 1.25rem;
+      }
+
+      .servicio-intro {
+        font-size: 1rem;
+      }
+    }
+    }
   }
 
   .servicio-content h3 {
@@ -889,6 +916,30 @@ h4 { font-size: 1.25rem; }
    QUIÉNES SOMOS
    ======================================== */
 .about-layout {
+
+  @media (max-width: 768px) {
+    .about-layout {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xl);
+    }
+
+    .about-image {
+      order: -1;
+    }
+
+    .about-text {
+      order: 0;
+    }
+
+    .image-wrapper {
+      width: 100%;
+    }
+
+    .about-text h1 {
+      font-size: 2rem;
+    }
+  }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-xl);
