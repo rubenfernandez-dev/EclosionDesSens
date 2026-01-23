@@ -4,23 +4,6 @@ require('dotenv').config();
 
 // Traducciones para emails
 const emailTranslations = {
-  es: {
-    confirmacion_titulo: '¡Gracias por tu reserva, {nombre}!',
-    confirmacion_subtitulo: 'Hemos recibido tu solicitud de reserva. A continuación, los detalles:',
-    fecha: 'Fecha',
-    hora: 'Hora',
-    tipo_masaje: 'Tipo de masaje',
-    tu_mensaje: 'Tu mensaje',
-    estado_confirmada: 'La reserva está confirmada',
-    duda_contacta: 'Si tienes alguna duda, no dudes en contactarnos.',
-    esperamos_pronto: 'Esperamos verte pronto y brindarte un momento de relajación absoluta.',
-    empresa_nueva_reserva: 'Nueva Reserva Recibida',
-    cliente: 'Cliente',
-    telefono: 'Teléfono',
-    email: 'Email',
-    mensaje: 'Mensaje',
-    registrada_el: 'Reserva registrada el'
-  },
   fr: {
     confirmacion_titulo: 'Merci pour votre réservation, {nombre}!',
     confirmacion_subtitulo: 'Nous avons reçu votre demande de réservation. Voici les détails:',
@@ -37,23 +20,6 @@ const emailTranslations = {
     email: 'Email',
     mensaje: 'Message',
     registrada_el: 'Réservation reçue le'
-  },
-  de: {
-    confirmacion_titulo: 'Danke für Ihre Reservierung, {nombre}!',
-    confirmacion_subtitulo: 'Wir haben Ihre Reservierungsanfrage erhalten. Hier sind die Details:',
-    fecha: 'Datum',
-    hora: 'Uhrzeit',
-    tipo_masaje: 'Massageart',
-    tu_mensaje: 'Ihre Nachricht',
-    estado_confirmada: 'Die Reservierung ist bestätigt',
-    duda_contacta: 'Bei Fragen zögern Sie nicht, uns zu kontaktieren.',
-    esperamos_pronto: 'Wir freuen uns, Sie bald zu sehen und Ihnen einen Moment absoluter Entspannung zu schenken.',
-    empresa_nueva_reserva: 'Neue Reservierung Eingegangen',
-    cliente: 'Kunde',
-    telefono: 'Telefon',
-    email: 'Email',
-    mensaje: 'Nachricht',
-    registrada_el: 'Reservierung erhalten am'
   }
 };
 

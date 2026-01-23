@@ -568,8 +568,8 @@ h4 { font-size: 1.25rem; }
 }
 
 .aceite-image {
-  height: 100%;
-  min-height: 300px;
+  height: 400px;
+  width: 400px;
   overflow: hidden;
   position: relative;
 }

@@ -52,6 +52,23 @@ CREATE TABLE IF NOT EXISTS disponibilidad (
 COMMENT='Disponibilidad de días y horas';
 
 -- ========================================
+-- TABLA: disponibilidad_bloqueada
+-- Almacena fechas y horas que están bloqueadas por reservas
+-- ========================================
+CREATE TABLE IF NOT EXISTS disponibilidad_bloqueada (
+  id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID del bloqueo',
+  fecha_reserva DATE NOT NULL COMMENT 'Fecha de la reserva',
+  hora_reserva TIME NOT NULL COMMENT 'Hora de la reserva',
+  reserva_id INT NOT NULL COMMENT 'ID de la reserva asociada',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_fecha_hora (fecha_reserva, hora_reserva),
+  FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
+  INDEX idx_fecha_reserva (fecha_reserva),
+  INDEX idx_reserva_id (reserva_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Horarios bloqueados por reservas';
+
+-- ========================================
 -- TABLA: admin_users
 -- Usuarios del panel de administración
 -- ========================================
