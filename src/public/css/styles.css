@@ -923,6 +923,17 @@ h4 { font-size: 1.25rem; }
   align-items: center;
 }
 
+.about-text-top,
+.about-text-bottom {
+  grid-column: 1;
+}
+
+.about-image-main,
+.about-image-citrico,
+.about-image-logo {
+  grid-column: 2;
+}
+
 .about-image-main { order: 0; }
 .about-image-secondary { order: 1; }
 
@@ -999,9 +1010,11 @@ h4 { font-size: 1.25rem; }
     gap: var(--spacing-xl);
   }
 
-  .about-image-main { order: -1; }
-  .about-text { order: 0; }
-  .about-image-secondary { order: 1; }
+  .about-image-main { order: -2; }
+  .about-text-top { order: -1; }
+  .about-image-citrico { order: 0; }
+  .about-text-bottom { order: 1; }
+  .about-image-logo { order: 2; }
 
   .image-wrapper {
     width: 100%;
