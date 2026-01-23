@@ -920,7 +920,7 @@ h4 { font-size: 1.25rem; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-xl);
-  align-items: center;
+  align-items: flex-start;
 }
 
 .about-text-top,
@@ -988,7 +988,7 @@ h4 { font-size: 1.25rem; }
 }
 
 .image-wrapper img {
-  width: 100%;
+  width: auto;
   display: block;
 }
 
