@@ -591,12 +591,13 @@ h4 { font-size: 1.25rem; }
 }
 
 .aceite-content {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-md);
 }
 
 .aceite-image {
-  height: 400px;
-  width: 400px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
   overflow: hidden;
   position: relative;
 }
@@ -628,18 +629,18 @@ h4 { font-size: 1.25rem; }
   }
 
   .aceite-image {
-    min-height: 250px;
-    max-height: 250px;
+    min-height: 220px;
+    max-height: 220px;
   }
 
   .aceite-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-sm);
   }
 }
 
 .aceite-item {
   background-color: var(--color-white);
-  padding: var(--spacing-md);
+  padding: 0;
   border-radius: 8px;
   border-left: 4px solid var(--color-primary);
 }
@@ -916,35 +917,14 @@ h4 { font-size: 1.25rem; }
    QUIÉNES SOMOS
    ======================================== */
 .about-layout {
-
-  @media (max-width: 768px) {
-    .about-layout {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xl);
-    }
-
-    .about-image {
-      order: -1;
-    }
-
-    .about-text {
-      order: 0;
-    }
-
-    .image-wrapper {
-      width: 100%;
-    }
-
-    .about-text h1 {
-      font-size: 2rem;
-    }
-  }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-xl);
   align-items: center;
 }
+
+.about-image-main { order: 0; }
+.about-image-secondary { order: 1; }
 
 .about-text h2 {
   margin-bottom: var(--spacing-md);
@@ -1010,6 +990,26 @@ h4 { font-size: 1.25rem; }
   padding: var(--spacing-md);
   color: var(--color-white);
   font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .about-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .about-image-main { order: -1; }
+  .about-text { order: 0; }
+  .about-image-secondary { order: 1; }
+
+  .image-wrapper {
+    width: 100%;
+  }
+
+  .about-text h1 {
+    font-size: 2rem;
+  }
 }
 
 /* Experiencia */
