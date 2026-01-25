@@ -6,6 +6,8 @@
 
   const reviewsGrid = document.getElementById('reviewsGrid');
   const loadMoreButton = document.getElementById('loadMoreReviews');
+  const averageEl = document.getElementById('reviewsAverage');
+  const countEl = document.getElementById('reviewsCount');
 
   if (!reviewsGrid || !loadMoreButton) {
     return;
@@ -13,6 +15,20 @@
 
   let reviews = [];
   let currentIndex = 0;
+
+  const createStars = (rating = 0) => {
+    const clamped = Math.max(0, Math.min(5, Number(rating) || 0));
+    const container = document.createElement('div');
+    container.className = 'review-stars';
+    container.setAttribute('aria-label', `${clamped} / 5`);
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.className = i <= clamped ? 'star full' : 'star empty';
+      star.textContent = i <= clamped ? '★' : '☆';
+      container.appendChild(star);
+    }
+    return container;
+  };
 
   const createReviewCard = (review) => {
     const card = document.createElement('div');
@@ -31,6 +47,8 @@
     const body = document.createElement('div');
     body.className = 'review-body';
 
+    const stars = createStars(review.rating);
+
     const text = document.createElement('p');
     text.className = 'review-text';
     text.textContent = review.text || '';
@@ -39,6 +57,7 @@
     author.className = 'review-author';
     author.textContent = review.author || 'Cliente';
 
+    body.appendChild(stars);
     body.appendChild(text);
     body.appendChild(author);
 
@@ -89,6 +108,13 @@
       currentIndex = 0;
       reviewsGrid.innerHTML = '';
       renderNextBatch(INITIAL_BATCH);
+
+      if (averageEl && countEl) {
+        const total = reviews.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+        const avg = reviews.length ? (total / reviews.length) : 0;
+        averageEl.textContent = avg.toFixed(1);
+        countEl.textContent = `(${reviews.length})`;
+      }
     } catch (error) {
       console.error('Error cargando reseñas:', error);
       reviewsGrid.innerHTML = '<p class="review-text">No se pudieron cargar las reseñas en este momento.</p>';

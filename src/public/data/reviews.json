@@ -2,51 +2,61 @@
   {
     "author": "Camille Laurent",
     "text": "Un soin d'une douceur incroyable. L'ambiance et l'attention aux détails m'ont permis de déconnecter complètement.",
-    "photo": "/img/room.png"
+    "photo": "/img/room.png",
+    "rating": 5
   },
   {
     "author": "Marc Steiner",
     "text": "Service très professionnel. Après une séance sportive, le massage m'a vraiment aidé à récupérer plus vite.",
-    "photo": null
+    "photo": null,
+    "rating": 5
   },
   {
     "author": "Elena Rossi",
     "text": "Esperienza fantastica. Ogni movimento è preciso e rilassante, mi sento rinata dopo ogni visita.",
-    "photo": "/img/1.png"
+    "photo": "/img/1.png",
+    "rating": 5
   },
   {
     "author": "Lucas Meyer",
     "text": "Ambiente très zen et accueil chaleureux. Je recommande pour toute personne en recherche de bien-être.",
-    "photo": null
+    "photo": null,
+    "rating": 4
   },
   {
     "author": "Sophie Dubois",
     "text": "Massage d'exception, j'ai senti chaque tension disparaître. Je reviendrai sans hésiter.",
-    "photo": "/img/2.png"
+    "photo": "/img/2.png",
+    "rating": 5
   },
   {
     "author": "Martin Keller",
     "text": "Excelente combinación de técnica y atención. Ideal después de semanas intensas de trabajo.",
-    "photo": null
+    "photo": null,
+    "rating": 4
   },
   {
     "author": "Ana Rodríguez",
     "text": "Un espacio acogedor con trato impecable. Salgo siempre ligera y con mucha energía positiva.",
-    "photo": "/img/logo.blanco.jpg"
+    "photo": "/img/logo.blanco.jpg",
+    "rating": 5
   },
   {
     "author": "Petra Novak",
     "text": "Sehr angenehme Atmosphäre. El masaje personalizado marcó la diferencia en mis dolores de espalda.",
-    "photo": null
+    "photo": null,
+    "rating": 4
   },
   {
     "author": "Clara Meier",
     "text": "Se nota la pasión y el cuidado en cada detalle. Recomendado para relajarse profundamente.",
-    "photo": "/img/room.png"
+    "photo": "/img/room.png",
+    "rating": 5
   },
   {
     "author": "Jonas Müller",
     "text": "J'ai essayé plusieurs lieux et celui-ci est de loin le plus complet: ambiance, technique et résultats.",
-    "photo": null
+    "photo": null,
+    "rating": 5
   }
 ]

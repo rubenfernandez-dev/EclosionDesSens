@@ -85,6 +85,10 @@
       "ambiente_desc": "Espacio tranquilo, seguro y acogedor para tu relajación",
       "testimonios_title": "Lo Que Nuestros Clientes Dicen",
       "testimonios_subtitle": "Experiencias reales de personas que han disfrutado nuestros servicios",
+      "reviews": {
+        "ver_mas": "Ver más reseñas",
+        "global_label": "Valoración global"
+      },
       "testimonio_pais_alemania": "Alemania",
       "testimonio_pais_francia": "Francia",
       "testimonio_pais_espana": "España",
@@ -108,6 +112,7 @@
       "blog_post2_excerpt": "Conoce las propiedades de diferentes aceites esenciales y cómo elegir el más adecuado según tus necesidades de relajación y bienestar.",
       "blog_post3_title": "Técnicas de Respiración para Potenciar tu Sesión de Masaje",
       "blog_post3_excerpt": "Aprende técnicas de respiración profunda que multiplicarán los beneficios de tu masaje y te ayudarán a alcanzar un estado de relajación completa.",
+      "cta_reservar": "Reservar cita",
       "faq_title": "Preguntas Frecuentes",
       "faq_subtitle": "Respuestas a las preguntas más comunes sobre nuestros servicios",
       "faq_q1": "¿Cuál es la duración de un masaje?",
@@ -415,6 +420,10 @@
       "ambiente_desc": "Espace tranquille, sûr et accueillant pour votre détente",
       "testimonios_title": "Ce Que Disent Nos Clients",
       "testimonios_subtitle": "Expériences réelles de personnes qui ont apprécié nos services",
+      "reviews": {
+        "ver_mas": "Voir plus d'avis",
+        "global_label": "Note globale"
+      },
       "testimonio_pais_alemania": "Allemagne",
       "testimonio_pais_francia": "France",
       "testimonio_pais_espana": "Espagne",
@@ -438,6 +447,7 @@
       "blog_post2_excerpt": "Apprenez les propriétés des différentes huiles essentielles et comment choisir la plus appropriée selon vos besoins de détente et bien-être.",
       "blog_post3_title": "Techniques de Respiration pour Amplifier votre Séance de Massage",
       "blog_post3_excerpt": "Apprenez des techniques de respiration profonde qui multiplieront les bienfaits de votre massage et vous aideront à atteindre un état de relaxation complète.",
+      "cta_reservar": "Prendre rendez-vous",
       "faq_title": "Questions Fréquemment Posées",
       "faq_subtitle": "Réponses aux questions les plus courantes sur nos services",
       "faq_q1": "Quelle est la durée d'un massage?",
@@ -747,6 +757,10 @@
       "ambiente_desc": "Ruhiger, sicherer und einladender Platz zum Entspannen",
       "testimonios_title": "Was Unsere Kunden Sagen",
       "testimonios_subtitle": "Echte Erfahrungen von Menschen, die unsere Dienste genossen haben",
+      "reviews": {
+        "ver_mas": "Mehr Bewertungen anzeigen",
+        "global_label": "Gesamtbewertung"
+      },
       "testimonio_pais_alemania": "Deutschland",
       "testimonio_pais_francia": "Frankreich",
       "testimonio_pais_espana": "Spanien",
@@ -770,6 +784,7 @@
       "blog_post2_excerpt": "Lernen Sie die Eigenschaften verschiedener ätherischer Öle kennen und wie Sie das am besten geeignete entsprechend Ihren Entspannungs- und Wellness-Bedürfnissen auswählen.",
       "blog_post3_title": "Atemtechniken zur Verstärkung Ihrer Massage-Sitzung",
       "blog_post3_excerpt": "Lernen Sie tiefe Atemtechniken, die die Vorteile Ihrer Massage vervielfachen und Ihnen helfen, einen Zustand vollständiger Entspannung zu erreichen.",
+      "cta_reservar": "Termin buchen",
       "faq_title": "Häufig Gestellte Fragen",
       "faq_subtitle": "Antworten auf häufig gestellte Fragen zu unseren Dienstleistungen",
       "faq_q1": "Wie lange dauert eine Massage?",
