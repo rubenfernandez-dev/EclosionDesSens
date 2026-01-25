@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (existingButton) return;
 
   const whatsappLink = document.createElement('a');
-  whatsappLink.href = 'https://wa.me/41765754559?text=Hola%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n';
+  whatsappLink.href = 'https://wa.me/41765754559?text=Bonjour%2C%20j%E2%80%99aimerais%20avoir%20plus%20d%E2%80%99informations';
   whatsappLink.target = '_blank';
   whatsappLink.rel = 'noopener noreferrer';
   whatsappLink.className = 'whatsapp-button';
