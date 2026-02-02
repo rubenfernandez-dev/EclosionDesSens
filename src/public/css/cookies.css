@@ -1,0 +1,115 @@
+/* ========================================
+   COOKIES BANNER - ÉCLOSION DES SENS
+   ======================================== */
+:root {
+  --cookie-bg: #f7f2ed;
+  --cookie-text: #3b3a3a;
+  --cookie-border: #e6dcd2;
+  --cookie-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --cookie-accent: #b05032;
+  --cookie-accent-dark: #8f3e27;
+}
+
+.cookie-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: none;
+  padding: 1rem;
+}
+
+.cookie-banner.is-visible {
+  display: block;
+}
+
+.cookie-banner__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--cookie-bg);
+  color: var(--cookie-text);
+  border: 1px solid var(--cookie-border);
+  border-radius: 16px;
+  box-shadow: var(--cookie-shadow);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cookie-banner__text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cookie-banner__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cookie-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.cookie-btn--primary {
+  background: var(--cookie-accent);
+  color: #fff;
+}
+
+.cookie-btn--primary:hover {
+  background: var(--cookie-accent-dark);
+}
+
+.cookie-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--cookie-accent);
+  color: var(--cookie-accent);
+}
+
+.cookie-btn--ghost:hover {
+  background: rgba(176, 80, 50, 0.08);
+}
+
+.cookie-link {
+  color: var(--cookie-accent);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.cookie-preferences {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #5a5858;
+}
+
+.cookie-preferences.is-visible {
+  display: block;
+}
+
+.cookie-preferences.is-hidden {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .cookie-banner__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cookie-banner__actions {
+    width: 100%;
+  }
+
+  .cookie-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -19,6 +19,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/cookies.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -367,11 +368,29 @@
             </div>
             
             <div class="footer-bottom">
-                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span> | <a href="politique-confidentialite.html" style="color: var(--color-beige); text-decoration: underline;">Politique de confidentialité</a></p>
+                <p><span id="footerYear"></span> <span data-i18n="footer.copyright_text">Éclosion des sens - eclosiondessens.ch. Todos los derechos reservados.</span> | <a href="politique-confidentialite.html" style="color: var(--color-beige); text-decoration: underline;">Politique de confidentialité</a> | <a href="politique-cookies.html" style="color: var(--color-beige); text-decoration: underline;">Politique de cookies</a> | <a href="mentions-legales.html" style="color: var(--color-beige); text-decoration: underline;">Mentions légales</a></p>
             </div>
         </div>
     </footer>
 
+    <!-- Bandeau cookies (affiché uniquement sur cette page) -->
+    <div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Gestion des cookies">
+        <div class="cookie-banner__inner">
+            <div class="cookie-banner__text">
+                <strong>Nous respectons votre vie privée.</strong> Nous utilisons uniquement des cookies essentiels pour le fonctionnement du site et, avec votre accord, des cookies de mesure d’audience afin d’améliorer votre expérience. <a class="cookie-link" href="/politique-cookies.html">En savoir plus</a>
+                <div class="cookie-preferences is-hidden">
+                    Personnalisation (bientôt disponible). Vous pourrez choisir vos préférences de cookies ici.
+                </div>
+            </div>
+            <div class="cookie-banner__actions">
+                <button class="cookie-btn cookie-btn--primary" data-cookie-action="accept">Accepter</button>
+                <button class="cookie-btn cookie-btn--ghost" data-cookie-action="reject">Refuser</button>
+                <button class="cookie-btn cookie-btn--ghost" data-cookie-action="customize">Personnaliser</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/cookies.js"></script>
     <script src="/js/language-manager.js"></script>
     <script src="/js/script.js"></script>
     <script src="/js/reviews.js"></script>
