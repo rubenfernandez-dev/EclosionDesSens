@@ -479,7 +479,18 @@ function renderDisponibilidad(slots) {
     card.className = 'slot-card';
 
     const diasNombre = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const nombreDia = slot.fecha ? new Date(slot.fecha).toLocaleDateString('es-ES', { weekday: 'long', month: 'short', day: 'numeric' }) : (diasNombre[slot.dia_semana] || slot.dia_semana);
+    let nombreDia;
+    if (slot.fecha) {
+      // MySQL puede devolver Date object o string YYYY-MM-DD
+      const raw = typeof slot.fecha === 'string' ? slot.fecha.slice(0, 10) : slot.fecha.toISOString().slice(0, 10);
+      const [y, m, d] = raw.split('-').map(Number);
+      const fecha = new Date(y, m - 1, d); // sin zona horaria
+      const weekday = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
+      const dateStr = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      nombreDia = weekday.charAt(0).toUpperCase() + weekday.slice(1) + ', ' + dateStr;
+    } else {
+      nombreDia = diasNombre[slot.dia_semana] || slot.dia_semana;
+    }
 
     card.innerHTML = `
       <div class="slot-info">

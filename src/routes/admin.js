@@ -153,7 +153,7 @@ router.delete('/reservas/:id', requireAdmin, async (req, res) => {
 router.get('/disponibilidad', requireAdmin, async (_req, res) => {
   try {
     const [rows] = await db.execute(
-      'SELECT id, dia_semana, hora, disponible FROM disponibilidad ORDER BY dia_semana ASC, hora ASC'
+      'SELECT id, dia_semana, fecha, hora, disponible FROM disponibilidad ORDER BY fecha ASC, dia_semana ASC, hora ASC'
     );
     res.json({ success: true, disponibilidad: rows });
   } catch (error) {
@@ -164,7 +164,7 @@ router.get('/disponibilidad', requireAdmin, async (_req, res) => {
 
 router.post('/disponibilidad', requireAdmin, async (req, res) => {
   try {
-    const { dia_semana, hora, disponible } = req.body;
+    const { dia_semana, fecha, hora, disponible } = req.body;
 
     if (dia_semana === undefined || hora === undefined) {
       return res.status(400).json({ success: false, message: 'dia_semana y hora son obligatorios' });
@@ -177,11 +177,12 @@ router.post('/disponibilidad', requireAdmin, async (req, res) => {
 
     const horaSql = hora.length === 5 ? `${hora}:00` : hora;
     const disponibleFlag = disponible === undefined ? 1 : Number(disponible) ? 1 : 0;
+    const fechaSql = fecha || null;
 
     try {
       await db.execute(
-        'INSERT INTO disponibilidad (dia_semana, hora, disponible) VALUES (?, ?, ?)',
-        [dia, horaSql, disponibleFlag]
+        'INSERT INTO disponibilidad (dia_semana, fecha, hora, disponible) VALUES (?, ?, ?, ?)',
+        [dia, fechaSql, horaSql, disponibleFlag]
       );
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
