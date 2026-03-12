@@ -9,6 +9,11 @@ const db = require('./config/db');
 const app = express();
 const PORT = process.env.PORT || 4000;
 const isProd = process.env.NODE_ENV === 'production';
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET no está definido. Configúralo en las variables de entorno antes de iniciar el servidor.');
+}
 
 app.set("trust proxy", 1);
 // Middlewares
@@ -17,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   name: process.env.SESSION_NAME || 'eds.sid',
-  secret: process.env.SESSION_SECRET || 'cambia-esto',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {
