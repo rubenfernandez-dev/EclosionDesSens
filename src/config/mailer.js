@@ -20,6 +20,40 @@ const emailTranslations = {
     email: 'Email',
     mensaje: 'Message',
     registrada_el: 'Réservation reçue le'
+  },
+  es: {
+    confirmacion_titulo: '¡Gracias por tu reserva, {nombre}!',
+    confirmacion_subtitulo: 'Hemos recibido tu solicitud de reserva. Aquí tienes los detalles:',
+    fecha: 'Fecha',
+    hora: 'Hora',
+    tipo_masaje: 'Tipo de masaje',
+    tu_mensaje: 'Tu mensaje',
+    estado_confirmada: 'La reserva está confirmada',
+    duda_contacta: 'Si tienes alguna duda, no dudes en contactarnos.',
+    esperamos_pronto: 'Te esperamos pronto para ofrecerte un momento de relajación absoluta.',
+    empresa_nueva_reserva: 'Nueva Reserva Recibida',
+    cliente: 'Cliente',
+    telefono: 'Teléfono',
+    email: 'Email',
+    mensaje: 'Mensaje',
+    registrada_el: 'Reserva recibida el'
+  },
+  de: {
+    confirmacion_titulo: 'Vielen Dank für Ihre Reservierung, {nombre}!',
+    confirmacion_subtitulo: 'Wir haben Ihre Reservierungsanfrage erhalten. Hier sind die Details:',
+    fecha: 'Datum',
+    hora: 'Uhrzeit',
+    tipo_masaje: 'Massageart',
+    tu_mensaje: 'Ihre Nachricht',
+    estado_confirmada: 'Die Reservierung ist bestätigt',
+    duda_contacta: 'Falls Sie Fragen haben, zögern Sie nicht, uns zu kontaktieren.',
+    esperamos_pronto: 'Wir freuen uns darauf, Ihnen bald einen Moment absoluter Entspannung zu bieten.',
+    empresa_nueva_reserva: 'Neue Reservierung Erhalten',
+    cliente: 'Kunde',
+    telefono: 'Telefon',
+    email: 'Email',
+    mensaje: 'Nachricht',
+    registrada_el: 'Reservierung erhalten am'
   }
 };
 
