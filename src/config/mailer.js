@@ -28,6 +28,18 @@ function getTranslation(idioma, key) {
   return emailTranslations[lang][key] || emailTranslations.fr[key];
 }
 
+// Evita que texto libre del cliente (nombre, mensaje) rompa o inyecte HTML
+// en los correos de Nodemailer, que interpolan estos valores directamente.
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Configurar transportador de correo
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -90,14 +102,14 @@ async function enviarConfirmacionReservaCliente(reserva) {
             <h1>Éclosion des sens</h1>
           </div>
           <div class="content">
-            <h2>${t('confirmacion_titulo').replace('{nombre}', reserva.nombre)}</h2>
+            <h2>${t('confirmacion_titulo').replace('{nombre}', escapeHtml(reserva.nombre))}</h2>
             <p>${t('confirmacion_subtitulo')}</p>
             <ul>
               <li><span class="highlight">${t('fecha')}:</span> ${reserva.fecha_reserva}</li>
               <li><span class="highlight">${t('hora')}:</span> ${reserva.hora_reserva}</li>
-              <li><span class="highlight">${t('tipo_masaje')}:</span> ${reserva.tipo_masaje}</li>
+              <li><span class="highlight">${t('tipo_masaje')}:</span> ${escapeHtml(reserva.tipo_masaje)}</li>
             </ul>
-            ${reserva.mensaje ? `<p><span class="highlight">${t('tu_mensaje')}:</span> ${reserva.mensaje}</p>` : ''}
+            ${reserva.mensaje ? `<p><span class="highlight">${t('tu_mensaje')}:</span> ${escapeHtml(reserva.mensaje)}</p>` : ''}
             <p>${t('estado_confirmada')}. ${t('duda_contacta')}</p>
             <p>${t('esperamos_pronto')}</p>
           </div>
@@ -155,13 +167,13 @@ async function enviarNotificacionReservaEmpresa(reserva) {
             </div>
             <h2>Nueva Reserva Recibida</h2>
             <div class="info">
-              <p><strong>Cliente:</strong> ${reserva.nombre}</p>
-              <p><strong>Teléfono:</strong> ${reserva.telefono}</p>
-              <p><strong>Email:</strong> ${reserva.email}</p>
+              <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
+              <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
+              <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
               <p><strong>Fecha:</strong> ${reserva.fecha_reserva}</p>
               <p><strong>Hora:</strong> ${reserva.hora_reserva}</p>
-              <p><strong>Tipo de masaje:</strong> ${reserva.tipo_masaje}</p>
-              ${reserva.mensaje ? `<p><strong>Mensaje:</strong> ${reserva.mensaje}</p>` : ''}
+              <p><strong>Tipo de masaje:</strong> ${escapeHtml(reserva.tipo_masaje)}</p>
+              ${reserva.mensaje ? `<p><strong>Mensaje:</strong> ${escapeHtml(reserva.mensaje)}</p>` : ''}
             </div>
             <p><small>Reserva registrada el: ${new Date().toLocaleString('es-ES')}</small></p>
           </div>
@@ -211,12 +223,12 @@ async function enviarNotificacionContactoEmpresa(contacto) {
             </div>
             <h2>Nuevo Mensaje de Contacto</h2>
             <div class="info">
-              <p><strong>Nombre:</strong> ${contacto.nombre}</p>
-              <p><strong>Email:</strong> ${contacto.email}</p>
+              <p><strong>Nombre:</strong> ${escapeHtml(contacto.nombre)}</p>
+              <p><strong>Email:</strong> ${escapeHtml(contacto.email)}</p>
             </div>
             <div class="mensaje">
               <p><strong>Mensaje:</strong></p>
-              <p>${contacto.mensaje}</p>
+              <p>${escapeHtml(contacto.mensaje)}</p>
             </div>
             <p><small>Mensaje recibido el: ${new Date().toLocaleString('es-ES')}</small></p>
           </div>

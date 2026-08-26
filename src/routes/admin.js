@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { rateLimit } = require('express-rate-limit');
 const router = express.Router();
 const db = require('../config/db');
+const { esEstadoValido, bloqueaHueco } = require('../utils/estadosReserva');
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
@@ -351,14 +352,75 @@ router.get('/reservas', requireAdmin, async (_req, res) => {
 });
 
 router.patch('/reservas/:id', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { estado, notas } = req.body;
+
+  if (estado !== undefined && !esEstadoValido(estado)) {
+    return res.status(400).json({ success: false, message: 'Estado no válido' });
+  }
+
+  if (estado === undefined && notas === undefined) {
+    return res.status(400).json({ success: false, message: 'No hay campos para actualizar' });
+  }
+
+  const connection = await db.getConnection();
   try {
-    const { id } = req.params;
-    const { estado, notas } = req.body;
+    await connection.beginTransaction();
+
+    let reservaActual = null;
+    if (estado !== undefined) {
+      // FOR UPDATE: bloquea esta fila concreta y evita que la lectura del
+      // estado actual establezca ya el snapshot de la transacción (ver nota
+      // más abajo sobre por qué eso importa para la comprobación de conflicto).
+      const [rows] = await connection.execute(
+        'SELECT estado, fecha_reserva, hora_reserva FROM reservas WHERE id = ? FOR UPDATE',
+        [id]
+      );
+      if (!rows.length) {
+        await connection.rollback();
+        return res.status(404).json({ success: false, message: 'Reserva no encontrada' });
+      }
+      reservaActual = rows[0];
+
+      const bloqueabaAntes = bloqueaHueco(reservaActual.estado);
+      const bloqueaAhora = bloqueaHueco(estado);
+
+      // Restaurar una reserva cancelada a un estado que bloquea el hueco:
+      // hay que comprobar que nadie más lo haya ocupado mientras tanto.
+      // Se bloquea (FOR UPDATE) la misma fila de `disponibilidad` que usa
+      // POST /api/reservas, para serializar contra una reserva nueva
+      // concurrente sobre el mismo slot. La comprobación de conflicto en
+      // `reservas` se hace DESPUÉS de adquirir ese lock, no antes.
+      if (!bloqueabaAntes && bloqueaAhora) {
+        const diaSemana = new Date(reservaActual.fecha_reserva).getDay();
+        const horaStr = String(reservaActual.hora_reserva).slice(0, 8);
+
+        await connection.execute(
+          'SELECT id FROM disponibilidad WHERE hora = ? AND (fecha = ? OR (fecha IS NULL AND dia_semana = ?)) FOR UPDATE',
+          [horaStr, reservaActual.fecha_reserva, diaSemana]
+        );
+
+        const [conflicto] = await connection.execute(
+          'SELECT id FROM reservas WHERE fecha_reserva = ? AND hora_reserva = ? AND estado != "cancelada" AND id != ?',
+          [reservaActual.fecha_reserva, reservaActual.hora_reserva, id]
+        );
+
+        if (conflicto.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({
+            success: false,
+            message: 'No se puede restaurar la reserva: ese horario ya está ocupado por otra reserva'
+          });
+        }
+      }
+      // Cancelar (bloqueaAhora === false) simplemente libera el hueco: las
+      // consultas de conflicto de POST y GET ya ignoran estado='cancelada',
+      // no hace falta ninguna otra operación aquí.
+    }
 
     const updates = [];
     const values = [];
-
-    if (estado) {
+    if (estado !== undefined) {
       updates.push('estado = ?');
       values.push(estado);
     }
@@ -367,35 +429,17 @@ router.patch('/reservas/:id', requireAdmin, async (req, res) => {
       updates.push('notas = ?');
       values.push(notas || null);
     }
-
-    if (!updates.length) {
-      return res.status(400).json({
-        success: false,
-        message: 'No hay campos para actualizar'
-      });
-    }
-
     values.push(id);
+    await connection.execute(`UPDATE reservas SET ${updates.join(', ')} WHERE id = ?`, values);
 
-    await db.execute(
-      `UPDATE reservas SET ${updates.join(', ')} WHERE id = ?`,
-      values
-    );
-
-    res.json({
-      success: true,
-      message: 'Reserva actualizada'
-    });
+    await connection.commit();
+    res.json({ success: true, message: 'Reserva actualizada' });
   } catch (error) {
-    console.error(
-      '❌ Error al actualizar reserva:',
-      error
-    );
-
-    res.status(500).json({
-      success: false,
-      message: 'No se pudo actualizar la reserva'
-    });
+    await connection.rollback();
+    console.error('❌ Error al actualizar reserva:', error);
+    res.status(500).json({ success: false, message: 'No se pudo actualizar la reserva' });
+  } finally {
+    connection.release();
   }
 });
 

@@ -40,33 +40,29 @@ COMMENT='Tabla de reservas de masajes';
 -- TABLA: disponibilidad
 -- Almacena slots disponibles por día y hora
 -- ========================================
+-- NOTA: `fecha` permite excepciones puntuales (fecha NULL = slot recurrente
+-- semanal; fecha NOT NULL = excepción para ese día concreto, que prevalece
+-- sobre el slot recurrente del mismo dia_semana/hora). Esquema sincronizado
+-- con producción; MySQL admite múltiples NULL en un índice UNIQUE, por lo que
+-- este índice NO impide duplicar un slot recurrente (fecha NULL) para el
+-- mismo dia_semana+hora.
 CREATE TABLE IF NOT EXISTS disponibilidad (
   id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID del slot',
   dia_semana TINYINT NOT NULL COMMENT '0=Domingo ... 6=Sábado',
+  fecha DATE NULL COMMENT 'NULL = slot recurrente semanal; fecha concreta = excepción puntual',
   hora TIME NOT NULL COMMENT 'Hora disponible (HH:MM:SS)',
   disponible TINYINT(1) NOT NULL DEFAULT 1 COMMENT '1 disponible, 0 no disponible',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_dia_hora (dia_semana, hora)
+  UNIQUE KEY uk_fecha_dia_hora (fecha, dia_semana, hora)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Disponibilidad de días y horas';
 
--- ========================================
--- TABLA: disponibilidad_bloqueada
--- Almacena fechas y horas que están bloqueadas por reservas
--- ========================================
-CREATE TABLE IF NOT EXISTS disponibilidad_bloqueada (
-  id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID del bloqueo',
-  fecha_reserva DATE NOT NULL COMMENT 'Fecha de la reserva',
-  hora_reserva TIME NOT NULL COMMENT 'Hora de la reserva',
-  reserva_id INT NOT NULL COMMENT 'ID de la reserva asociada',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_fecha_hora (fecha_reserva, hora_reserva),
-  FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
-  INDEX idx_fecha_reserva (fecha_reserva),
-  INDEX idx_reserva_id (reserva_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Horarios bloqueados por reservas';
+-- NOTA: existió aquí una tabla `disponibilidad_bloqueada` en el esquema
+-- versionado, pero nunca se aplicó a producción (SHOW TABLES LIKE
+-- 'disponibilidad%' en producción solo devuelve `disponibilidad`) y no la usa
+-- ningún código vigente. `reservas` (columnas fecha_reserva/hora_reserva/
+-- estado) es la única fuente de verdad sobre qué huecos están ocupados.
 
 -- ========================================
 -- TABLA: admin_users

@@ -121,7 +121,6 @@ Public:
 - POST /api/reservas
 - GET /api/reservas/disponibilidad
 - GET /api/reservas/disponibilidad/:fecha
-- DELETE /api/reservas/:id
 - POST /api/contacto
 
 Admin (session-protected unless noted):
