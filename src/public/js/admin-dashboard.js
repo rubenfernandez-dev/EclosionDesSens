@@ -1,5 +1,5 @@
 const estados = ['pendiente', 'confirmada', 'completada', 'cancelada'];
-
+let csrfToken = null;
 // Variables de ordenamiento
 let currentSort = { field: 'fecha_reserva', direction: 'desc' };
 let allReservas = [];
@@ -14,26 +14,47 @@ function showMessage(text, type = 'success') {
 }
 
 async function fetchJson(url, options = {}) {
+  const method = (options.method || 'GET').toUpperCase();
+
+  const headers = {
+    ...(options.headers || {})
+  };
+
+  if (
+    csrfToken &&
+    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)
+  ) {
+    headers['X-CSRF-Token'] = csrfToken;
+  }
+
   const res = await fetch(url, {
     ...options,
-    credentials: "include" // 🔥 OBLIGATORIO
+    headers,
+    credentials: 'include'
   });
+
   if (res.status === 401) {
     window.location.href = '/admin/login.html';
     return null;
   }
+
   const data = await res.json();
   return data;
 }
 
 async function ensureAuth() {
   const data = await fetchJson('/api/admin/me');
+
   if (data && data.success && data.user) {
+    csrfToken = data.csrfToken;
+
     const tag = document.getElementById('userTag');
-    if (tag) tag.textContent = `${data.user.username} · ${data.user.role}`;
+
+    if (tag) {
+      tag.textContent = `${data.user.username} · ${data.user.role}`;
+    }
   }
 }
-
 // ============================================
 // ORDENAMIENTO DE TABLA
 // ============================================

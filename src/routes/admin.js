@@ -1,21 +1,88 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { rateLimit } = require('express-rate-limit');
 const router = express.Router();
 const db = require('../config/db');
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+
+  // Un login correcto no consume intentos.
+  skipSuccessfulRequests: true,
+
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+
+  message: {
+    success: false,
+    message: 'Demasiados intentos de inicio de sesión. Inténtalo de nuevo más tarde.'
+  }
+});
+
+function ensureCsrfToken(req) {
+  if (!req.session.csrfToken) {
+    req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+  }
+
+  return req.session.csrfToken;
+}
+
+function requireCsrf(req, res, next) {
+  const expectedToken = req.session?.csrfToken;
+  const receivedToken = req.get('X-CSRF-Token');
+
+  if (!expectedToken || !receivedToken) {
+    return res.status(403).json({
+      success: false,
+      message: 'Token CSRF inválido o ausente'
+    });
+  }
+
+  const expectedBuffer = Buffer.from(expectedToken);
+  const receivedBuffer = Buffer.from(receivedToken);
+
+  if (
+    expectedBuffer.length !== receivedBuffer.length ||
+    !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: 'Token CSRF inválido o ausente'
+    });
+  }
+
+  return next();
+}
+
+// ========================================
+// MIDDLEWARE DE AUTENTICACIÓN ADMIN
+// ========================================
 
 function requireAdmin(req, res, next) {
   if (req.session && req.session.user) {
     return next();
   }
-  return res.status(401).json({ success: false, message: 'No autorizado' });
+
+  return res.status(401).json({
+    success: false,
+    message: 'No autorizado'
+  });
 }
 
-router.post('/login', async (req, res) => {
+// ========================================
+// LOGIN
+// ========================================
+
+router.post('/login', adminLoginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Usuario y contraseña son obligatorios' });
+      return res.status(400).json({
+        success: false,
+        message: 'Usuario y contraseña son obligatorios'
+      });
     }
 
     const [rows] = await db.execute(
@@ -24,49 +91,170 @@ router.post('/login', async (req, res) => {
     );
 
     if (!rows.length) {
-      return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
     }
 
     const user = rows[0];
-    const isValid = await bcrypt.compare(password, user.password_hash);
+
+    const isValid = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+
     if (!isValid) {
-      return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
     }
 
-    req.session.user = { id: user.id, username: user.username, role: user.role };
-    res.json({ success: true, user: { username: user.username, role: user.role } });
+    // Regenerar completamente la sesión después de autenticar
+    // para evitar ataques de session fixation.
+    await new Promise((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      role: user.role
+    };
+
+
+    req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+
+    // Guardar explícitamente la nueva sesión antes de responder.
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+
+    return res.json({
+      success: true,
+      user: {
+        username: user.username,
+        role: user.role
+      }
+    });
   } catch (error) {
     console.error('❌ Error en login admin:', error);
-    res.status(500).json({ success: false, message: 'Error en el inicio de sesión' });
+
+    return res.status(500).json({
+      success: false,
+      message: 'Error en el inicio de sesión'
+    });
   }
 });
 
+// ========================================
+// PROTECCIÓN CSRF
+// ========================================
+
+router.use((req, res, next) => {
+  const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
+  if (!unsafeMethods.includes(req.method)) {
+    return next();
+  }
+
+  return requireCsrf(req, res, next);
+});
+
+// ========================================
+// LOGOUT
+// ========================================
+
 router.post('/logout', (req, res) => {
-  req.session.destroy(() => {
+  if (!req.session) {
     res.clearCookie(process.env.SESSION_NAME || 'eds.sid');
-    res.json({ success: true });
+
+    return res.json({
+      success: true
+    });
+  }
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('❌ Error al cerrar sesión admin:', err);
+
+      return res.status(500).json({
+        success: false,
+        message: 'No se pudo cerrar la sesión'
+      });
+    }
+
+    res.clearCookie(process.env.SESSION_NAME || 'eds.sid');
+
+    return res.json({
+      success: true
+    });
   });
 });
 
+// ========================================
+// USUARIO ACTUAL
+// ========================================
+
 router.get('/me', requireAdmin, (req, res) => {
-  res.json({ success: true, user: req.session.user });
+const csrfToken = ensureCsrfToken(req);
+  res.json({
+    success: true,
+    user: req.session.user,
+    csrfToken
+  });
 });
+
+// ========================================
+// CAMBIO DE CONTRASEÑA
+// ========================================
 
 router.patch('/me/password', requireAdmin, async (req, res) => {
   try {
-    const { currentPassword, newPassword, newPasswordConfirm } = req.body;
+    const {
+      currentPassword,
+      newPassword,
+      newPasswordConfirm
+    } = req.body;
+
     const userId = req.session.user.id;
 
-    if (!currentPassword || !newPassword || !newPasswordConfirm) {
-      return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
+    if (
+      !currentPassword ||
+      !newPassword ||
+      !newPasswordConfirm
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Todos los campos son obligatorios'
+      });
     }
 
     if (newPassword !== newPasswordConfirm) {
-      return res.status(400).json({ success: false, message: 'Las contraseñas nuevas no coinciden' });
+      return res.status(400).json({
+        success: false,
+        message: 'Las contraseñas nuevas no coinciden'
+      });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'La contraseña debe tener al menos 6 caracteres' });
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
     }
 
     const [rows] = await db.execute(
@@ -75,37 +263,90 @@ router.patch('/me/password', requireAdmin, async (req, res) => {
     );
 
     if (!rows.length) {
-      return res.status(401).json({ success: false, message: 'Usuario no encontrado' });
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
     }
 
     const user = rows[0];
-    const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+
+    const isValid = await bcrypt.compare(
+      currentPassword,
+      user.password_hash
+    );
+
     if (!isValid) {
-      return res.status(401).json({ success: false, message: 'Contraseña actual incorrecta' });
+      return res.status(401).json({
+        success: false,
+        message: 'Contraseña actual incorrecta'
+      });
     }
 
-    const newHash = await bcrypt.hash(newPassword, 10);
-    await db.execute('UPDATE admin_users SET password_hash = ? WHERE id = ?', [newHash, userId]);
+    const newHash = await bcrypt.hash(
+      newPassword,
+      10
+    );
 
-    res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+    await db.execute(
+      'UPDATE admin_users SET password_hash = ? WHERE id = ?',
+      [newHash, userId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Contraseña actualizada correctamente'
+    });
   } catch (error) {
-    console.error('❌ Error al cambiar contraseña:', error);
-    res.status(500).json({ success: false, message: 'No se pudo cambiar la contraseña' });
+    console.error(
+      '❌ Error al cambiar contraseña:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: 'No se pudo cambiar la contraseña'
+    });
   }
 });
 
+// ========================================
+// RESERVAS
+// ========================================
 
 router.get('/reservas', requireAdmin, async (_req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT id, nombre, telefono, email, fecha_reserva, hora_reserva, tipo_masaje, estado, notas, mensaje, created_at
+      `SELECT
+        id,
+        nombre,
+        telefono,
+        email,
+        fecha_reserva,
+        hora_reserva,
+        tipo_masaje,
+        estado,
+        notas,
+        mensaje,
+        created_at
        FROM reservas
        ORDER BY fecha_reserva DESC, hora_reserva DESC`
     );
-    res.json({ success: true, reservas: rows });
+
+    res.json({
+      success: true,
+      reservas: rows
+    });
   } catch (error) {
-    console.error('❌ Error al obtener reservas:', error);
-    res.status(500).json({ success: false, message: 'No se pudo obtener las reservas' });
+    console.error(
+      '❌ Error al obtener reservas:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: 'No se pudo obtener las reservas'
+    });
   }
 });
 
@@ -121,133 +362,312 @@ router.patch('/reservas/:id', requireAdmin, async (req, res) => {
       updates.push('estado = ?');
       values.push(estado);
     }
+
     if (notas !== undefined) {
       updates.push('notas = ?');
       values.push(notas || null);
     }
 
     if (!updates.length) {
-      return res.status(400).json({ success: false, message: 'No hay campos para actualizar' });
+      return res.status(400).json({
+        success: false,
+        message: 'No hay campos para actualizar'
+      });
     }
 
     values.push(id);
-    await db.execute(`UPDATE reservas SET ${updates.join(', ')} WHERE id = ?`, values);
-    res.json({ success: true, message: 'Reserva actualizada' });
+
+    await db.execute(
+      `UPDATE reservas SET ${updates.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    res.json({
+      success: true,
+      message: 'Reserva actualizada'
+    });
   } catch (error) {
-    console.error('❌ Error al actualizar reserva:', error);
-    res.status(500).json({ success: false, message: 'No se pudo actualizar la reserva' });
+    console.error(
+      '❌ Error al actualizar reserva:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: 'No se pudo actualizar la reserva'
+    });
   }
 });
 
 router.delete('/reservas/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    await db.execute('DELETE FROM reservas WHERE id = ?', [id]);
-    res.json({ success: true, message: 'Reserva eliminada' });
-  } catch (error) {
-    console.error('❌ Error al eliminar reserva:', error);
-    res.status(500).json({ success: false, message: 'No se pudo eliminar la reserva' });
-  }
-});
 
-router.get('/disponibilidad', requireAdmin, async (_req, res) => {
-  try {
-    const [rows] = await db.execute(
-      'SELECT id, dia_semana, fecha, hora, disponible FROM disponibilidad ORDER BY fecha ASC, dia_semana ASC, hora ASC'
+    await db.execute(
+      'DELETE FROM reservas WHERE id = ?',
+      [id]
     );
-    res.json({ success: true, disponibilidad: rows });
+
+    res.json({
+      success: true,
+      message: 'Reserva eliminada'
+    });
   } catch (error) {
-    console.error('❌ Error al obtener disponibilidad:', error);
-    res.status(500).json({ success: false, message: 'No se pudo obtener la disponibilidad' });
+    console.error(
+      '❌ Error al eliminar reserva:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: 'No se pudo eliminar la reserva'
+    });
   }
 });
 
-router.post('/disponibilidad', requireAdmin, async (req, res) => {
-  try {
-    const { dia_semana, fecha, hora, disponible } = req.body;
+// ========================================
+// DISPONIBILIDAD
+// ========================================
 
-    if (dia_semana === undefined || hora === undefined) {
-      return res.status(400).json({ success: false, message: 'dia_semana y hora son obligatorios' });
-    }
-
-    const dia = Number(dia_semana);
-    if (Number.isNaN(dia) || dia < 0 || dia > 6) {
-      return res.status(400).json({ success: false, message: 'dia_semana debe estar entre 0 y 6' });
-    }
-
-    const horaSql = hora.length === 5 ? `${hora}:00` : hora;
-    const disponibleFlag = disponible === undefined ? 1 : Number(disponible) ? 1 : 0;
-    const fechaSql = fecha || null;
-
+router.get(
+  '/disponibilidad',
+  requireAdmin,
+  async (_req, res) => {
     try {
-      await db.execute(
-        'INSERT INTO disponibilidad (dia_semana, fecha, hora, disponible) VALUES (?, ?, ?, ?)',
-        [dia, fechaSql, horaSql, disponibleFlag]
+      const [rows] = await db.execute(
+        `SELECT
+          id,
+          dia_semana,
+          fecha,
+          hora,
+          disponible
+         FROM disponibilidad
+         ORDER BY fecha ASC, dia_semana ASC, hora ASC`
       );
-    } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ success: false, message: 'Ya existe un slot para ese día y hora' });
-      }
-      throw err;
+
+      res.json({
+        success: true,
+        disponibilidad: rows
+      });
+    } catch (error) {
+      console.error(
+        '❌ Error al obtener disponibilidad:',
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message: 'No se pudo obtener la disponibilidad'
+      });
     }
-
-    res.status(201).json({ success: true, message: 'Slot agregado' });
-  } catch (error) {
-    console.error('❌ Error al crear disponibilidad:', error);
-    res.status(500).json({ success: false, message: 'No se pudo crear el slot' });
   }
-});
+);
 
-router.patch('/disponibilidad/:id', requireAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { dia_semana, hora, disponible } = req.body;
+router.post(
+  '/disponibilidad',
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const {
+        dia_semana,
+        fecha,
+        hora,
+        disponible
+      } = req.body;
 
-    const updates = [];
-    const values = [];
+      if (
+        dia_semana === undefined ||
+        hora === undefined
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'dia_semana y hora son obligatorios'
+        });
+      }
 
-    if (dia_semana !== undefined) {
       const dia = Number(dia_semana);
-      if (Number.isNaN(dia) || dia < 0 || dia > 6) {
-        return res.status(400).json({ success: false, message: 'dia_semana debe estar entre 0 y 6' });
+
+      if (
+        Number.isNaN(dia) ||
+        dia < 0 ||
+        dia > 6
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'dia_semana debe estar entre 0 y 6'
+        });
       }
-      updates.push('dia_semana = ?');
-      values.push(dia);
-    }
 
-    if (hora !== undefined) {
-      const horaSql = hora.length === 5 ? `${hora}:00` : hora;
-      updates.push('hora = ?');
-      values.push(horaSql);
-    }
+      const horaSql =
+        hora.length === 5
+          ? `${hora}:00`
+          : hora;
 
-    if (disponible !== undefined) {
-      updates.push('disponible = ?');
-      values.push(Number(disponible) ? 1 : 0);
-    }
+      const disponibleFlag =
+        disponible === undefined
+          ? 1
+          : Number(disponible)
+            ? 1
+            : 0;
 
-    if (!updates.length) {
-      return res.status(400).json({ success: false, message: 'No hay campos para actualizar' });
-    }
+      const fechaSql = fecha || null;
 
-    values.push(id);
-    await db.execute(`UPDATE disponibilidad SET ${updates.join(', ')} WHERE id = ?`, values);
-    res.json({ success: true, message: 'Slot actualizado' });
-  } catch (error) {
-    console.error('❌ Error al actualizar disponibilidad:', error);
-    res.status(500).json({ success: false, message: 'No se pudo actualizar el slot' });
+      try {
+        await db.execute(
+          `INSERT INTO disponibilidad
+           (dia_semana, fecha, hora, disponible)
+           VALUES (?, ?, ?, ?)`,
+          [
+            dia,
+            fechaSql,
+            horaSql,
+            disponibleFlag
+          ]
+        );
+      } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(409).json({
+            success: false,
+            message: 'Ya existe un slot para ese día y hora'
+          });
+        }
+
+        throw err;
+      }
+
+      res.status(201).json({
+        success: true,
+        message: 'Slot agregado'
+      });
+    } catch (error) {
+      console.error(
+        '❌ Error al crear disponibilidad:',
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message: 'No se pudo crear el slot'
+      });
+    }
   }
-});
+);
 
-router.delete('/disponibilidad/:id', requireAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await db.execute('DELETE FROM disponibilidad WHERE id = ?', [id]);
-    res.json({ success: true, message: 'Slot eliminado' });
-  } catch (error) {
-    console.error('❌ Error al eliminar disponibilidad:', error);
-    res.status(500).json({ success: false, message: 'No se pudo eliminar el slot' });
+router.patch(
+  '/disponibilidad/:id',
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const {
+        dia_semana,
+        hora,
+        disponible
+      } = req.body;
+
+      const updates = [];
+      const values = [];
+
+      if (dia_semana !== undefined) {
+        const dia = Number(dia_semana);
+
+        if (
+          Number.isNaN(dia) ||
+          dia < 0 ||
+          dia > 6
+        ) {
+          return res.status(400).json({
+            success: false,
+            message: 'dia_semana debe estar entre 0 y 6'
+          });
+        }
+
+        updates.push('dia_semana = ?');
+        values.push(dia);
+      }
+
+      if (hora !== undefined) {
+        const horaSql =
+          hora.length === 5
+            ? `${hora}:00`
+            : hora;
+
+        updates.push('hora = ?');
+        values.push(horaSql);
+      }
+
+      if (disponible !== undefined) {
+        updates.push('disponible = ?');
+        values.push(
+          Number(disponible)
+            ? 1
+            : 0
+        );
+      }
+
+      if (!updates.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'No hay campos para actualizar'
+        });
+      }
+
+      values.push(id);
+
+      await db.execute(
+        `UPDATE disponibilidad
+         SET ${updates.join(', ')}
+         WHERE id = ?`,
+        values
+      );
+
+      res.json({
+        success: true,
+        message: 'Slot actualizado'
+      });
+    } catch (error) {
+      console.error(
+        '❌ Error al actualizar disponibilidad:',
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message: 'No se pudo actualizar el slot'
+      });
+    }
   }
-});
+);
+
+router.delete(
+  '/disponibilidad/:id',
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      await db.execute(
+        'DELETE FROM disponibilidad WHERE id = ?',
+        [id]
+      );
+
+      res.json({
+        success: true,
+        message: 'Slot eliminado'
+      });
+    } catch (error) {
+      console.error(
+        '❌ Error al eliminar disponibilidad:',
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message: 'No se pudo eliminar el slot'
+      });
+    }
+  }
+);
 
 module.exports = router;

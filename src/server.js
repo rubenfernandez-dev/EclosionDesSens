@@ -1,110 +1,207 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const db = require('./config/db');
 
 const app = express();
+app.disable('x-powered-by');
+
 const PORT = process.env.PORT || 4000;
 const isProd = process.env.NODE_ENV === 'production';
 const sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionSecret) {
-  throw new Error('SESSION_SECRET no está definido. Configúralo en las variables de entorno antes de iniciar el servidor.');
+  throw new Error(
+    'SESSION_SECRET no está definido. Configúralo en las variables de entorno antes de iniciar el servidor.'
+  );
 }
 
-app.set("trust proxy", 1);
-// Middlewares
+app.set('trust proxy', 1);
+
+// ========================================
+// SESIONES PERSISTENTES EN MYSQL
+// ========================================
+
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+
+  createDatabaseTable: true,
+  clearExpired: true,
+  checkExpirationInterval: 15 * 60 * 1000,
+  expiration: 4 * 60 * 60 * 1000
+});
+
+// ========================================
+// MIDDLEWARES
+// ========================================
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
-  name: process.env.SESSION_NAME || 'eds.sid',
-  secret: sessionSecret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    maxAge: 1000 * 60 * 60 * 4 // 4 horas
+app.use(
+  session({
+    name: process.env.SESSION_NAME || 'eds.sid',
+    secret: sessionSecret,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 4 // 4 horas
+    }
+  })
+);
+
+// ========================================
+// PROTECCIÓN SERVER-SIDE DEL PANEL ADMIN
+// ========================================
+
+app.use('/admin', (req, res, next) => {
+  // El login debe permanecer accesible sin sesión.
+  if (req.path === '/login' || req.path === '/login.html') {
+    return next();
   }
-}));
 
-// Servir archivos estáticos desde la carpeta public
-app.use(express.static(path.join(__dirname, 'public')));
+  // Evita que páginas protegidas del Admin queden cacheadas.
+  res.set('Cache-Control', 'no-store');
 
-// Servir favicon desde la raíz del proyecto
-app.use(express.static(path.join(__dirname, '..')));
+  if (req.session && req.session.user) {
+    return next();
+  }
+
+  return res.redirect('/admin/login');
+});
 
 // ========================================
-// RUTAS LIMPIAS PARA PANEL ADMIN
+// RUTAS DEL PANEL ADMIN
 // ========================================
-// /admin → redirige a /admin/dashboard
+
+// /admin → dashboard
+// Si no existe sesión, el middleware anterior redirige al login.
 app.get('/admin', (req, res) => {
   res.redirect('/admin/dashboard');
 });
 
-// /admin/login → sirve login.html
+// Login
 app.get('/admin/login', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   res.sendFile(path.join(__dirname, 'public/admin/login.html'));
 });
 
-// /admin/dashboard → sirve dashboard.html (con verificación de sesión)
+// Compatibilidad con la URL física anterior
+app.get('/admin/login.html', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public/admin/login.html'));
+});
+
+// Dashboard protegido
 app.get('/admin/dashboard', (req, res) => {
-  // Nota: La verificación de sesión se realiza en el lado del cliente con JavaScript
-  // o en las rutas /api/admin si necesitas protección en backend
   res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 });
 
-// Importar rutas
+// Impide saltarse la protección entrando directamente al HTML
+app.get('/admin/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
+});
+
+// ========================================
+// ARCHIVOS ESTÁTICOS
+// IMPORTANTE: después de la protección /admin
+// ========================================
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// ========================================
+// IMPORTAR RUTAS API
+// ========================================
+
 const reservasRoutes = require('./routes/reservas');
 const contactoRoutes = require('./routes/contacto');
 const adminRoutes = require('./routes/admin');
 
-// Usar rutas
+// ========================================
+// USAR RUTAS API
+// ========================================
+
 app.use('/api/reservas', reservasRoutes);
 app.use('/api/contacto', contactoRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Ruta principal - servir index.html
+// ========================================
+// RUTA PRINCIPAL
+// ========================================
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Manejo de errores 404
+// ========================================
+// 404
+// ========================================
+
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');
 });
 
-// Manejo de errores generales
+// ========================================
+// MANEJO GENERAL DE ERRORES
+// ========================================
+
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: 'Error interno del servidor' 
+
+  res.status(500).json({
+    success: false,
+    message: 'Error interno del servidor'
   });
 });
 
-// Iniciar servidor
+// ========================================
+// ADMIN POR DEFECTO
+// ========================================
+
 async function ensureDefaultAdmin() {
   const username = process.env.ADMIN_DEFAULT_USER;
   const password = process.env.ADMIN_DEFAULT_PASSWORD;
 
   if (!username || !password) {
-    console.warn('⚠️ ADMIN_DEFAULT_USER o ADMIN_DEFAULT_PASSWORD no definidos. Crea al menos un usuario admin.');
+    console.warn(
+      '⚠️ ADMIN_DEFAULT_USER o ADMIN_DEFAULT_PASSWORD no definidos. Crea al menos un usuario admin.'
+    );
     return;
   }
 
-  const [rows] = await db.execute('SELECT id FROM admin_users WHERE username = ? LIMIT 1', [username]);
+  const [rows] = await db.execute(
+    'SELECT id FROM admin_users WHERE username = ? LIMIT 1',
+    [username]
+  );
+
   if (rows.length) return;
 
   const hash = await bcrypt.hash(password, 10);
-  await db.execute('INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)', [username, hash, 'admin']);
+
+  await db.execute(
+    'INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)',
+    [username, hash, 'admin']
+  );
+
   console.log(`✅ Usuario admin creado: ${username}`);
 }
+
+// ========================================
+// INICIAR SERVIDOR
+// ========================================
 
 app.listen(PORT, () => {
   console.log(`
@@ -116,7 +213,10 @@ app.listen(PORT, () => {
   `);
 
   ensureDefaultAdmin().catch((err) => {
-    console.error('❌ No se pudo crear el admin por defecto:', err.message);
+    console.error(
+      '❌ No se pudo crear el admin por defecto:',
+      err.message
+    );
   });
 });
 
