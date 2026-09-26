@@ -73,22 +73,20 @@ function esTipoMasajeValido(tipo) {
 }
 
 /**
- * Resuelve si hay disponibilidad efectiva para una fecha+hora dadas.
- * Precedencia: una excepción puntual (fecha específica) para esa hora
- * prevalece sobre el slot recurrente (fecha NULL) del mismo día de semana.
- * `filas` son las filas ya obtenidas de la tabla `disponibilidad` que
- * coinciden con (fecha = fecha) OR (fecha IS NULL AND dia_semana = diaSemana).
+ * Resuelve si hay disponibilidad efectiva para una hora dada.
+ * Solo cuenta un slot configurado para una fecha concreta (fecha no NULL)
+ * y marcado como disponible: las filas antiguas con fecha NULL (horarios
+ * semanales) no forman parte del producto y nunca dan disponibilidad.
+ * `filas` son las filas ya obtenidas de la tabla `disponibilidad` para la
+ * fecha solicitada.
  */
 function resolverDisponibilidad(filas, horaNormalizada) {
-  const excepcion = filas.find(f => f.fecha !== null && String(f.hora).slice(0, 8) === horaNormalizada);
-  if (excepcion) {
-    return excepcion.disponible === 1 || excepcion.disponible === true;
-  }
-  const recurrente = filas.find(f => f.fecha === null && String(f.hora).slice(0, 8) === horaNormalizada);
-  if (recurrente) {
-    return recurrente.disponible === 1 || recurrente.disponible === true;
-  }
-  return false;
+  return filas.some(f =>
+    f.fecha !== null &&
+    f.fecha !== undefined &&
+    String(f.hora).slice(0, 8) === horaNormalizada &&
+    (f.disponible === 1 || f.disponible === true)
+  );
 }
 
 module.exports = {

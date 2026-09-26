@@ -161,58 +161,24 @@ document.addEventListener('DOMContentLoaded', () => {
 // FORMULARIO DE RESERVAS
 // ========================================
 const reservaForm = document.getElementById('reservaForm');
-let disponibilidadSlots = [];
+// Horas disponibles (HH:MM) de la fecha seleccionada, tal como las devuelve
+// GET /api/reservas/disponibilidad/:fecha. Solo sirve para coherencia de UI:
+// el backend es quien valida realmente la disponibilidad.
+let horasDisponiblesFecha = [];
+let peticionDisponibilidadActual = 0;
 
-async function cargarDisponibilidad() {
-  try {
-    const res = await fetch('/api/reservas/disponibilidad');
-    const data = await res.json();
-    if (data.success) {
-      disponibilidadSlots = data.disponibilidad || [];
-      actualizarHorasSegunDia();
-    }
-  } catch (err) {
-    console.error('No se pudo cargar disponibilidad', err);
-  }
-}
-
-function horasPorDia(diaSemana) {
-  return disponibilidadSlots
-    .filter(slot => Number(slot.dia_semana) === Number(diaSemana) && Number(slot.disponible) === 1)
-    .map(slot => (slot.hora || '').slice(0, 5))
-    .filter(Boolean)
-    .sort();
-}
-
-function actualizarHorasSegunDia() {
-  const fechaInput = document.getElementById('fecha_reserva');
+/**
+ * Rellena el selector de hora con una opción inicial y las horas dadas.
+ * Sin horas, el selector queda deshabilitado.
+ */
+function prepararSelectorHora(textoInicial, horas = []) {
   const horaSelect = document.getElementById('hora_reserva');
-  if (!fechaInput || !horaSelect) return;
-
-  const fechaValor = fechaInput.value;
-  if (!fechaValor) {
-    horaSelect.innerHTML = '<option value="">Selecciona una hora disponible</option>';
-    horaSelect.setCustomValidity('Selecciona una fecha para ver los horarios');
-    return;
-  }
-
-  const diaSemana = new Date(fechaValor).getDay(); // 0 domingo ... 6 sábado
-  const horas = horasPorDia(diaSemana);
+  if (!horaSelect) return;
 
   horaSelect.innerHTML = '';
-  if (!horas.length) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'No hay horarios para este día';
-    horaSelect.appendChild(opt);
-    horaSelect.setCustomValidity('No hay horarios disponibles para este día');
-    return;
-  }
-
-  horaSelect.setCustomValidity('');
   const placeholder = document.createElement('option');
   placeholder.value = '';
-  placeholder.textContent = 'Selecciona una hora disponible';
+  placeholder.textContent = textoInicial;
   horaSelect.appendChild(placeholder);
 
   horas.forEach(h => {
@@ -221,6 +187,45 @@ function actualizarHorasSegunDia() {
     opt.textContent = h;
     horaSelect.appendChild(opt);
   });
+
+  horaSelect.disabled = horas.length === 0;
+}
+
+/**
+ * Carga las horas configuradas por el administrador para una fecha concreta.
+ */
+async function cargarHorasFecha(fecha) {
+  const peticion = ++peticionDisponibilidadActual;
+  horasDisponiblesFecha = [];
+
+  if (!fecha) {
+    prepararSelectorHora('Selecciona una fecha');
+    return;
+  }
+
+  prepararSelectorHora('Cargando horarios...');
+
+  try {
+    const res = await fetch(`/api/reservas/disponibilidad/${encodeURIComponent(fecha)}`);
+    const data = await res.json();
+    // Descarta respuestas de una fecha que ya no está seleccionada
+    if (peticion !== peticionDisponibilidadActual) return;
+
+    if (!res.ok || !data.success || !Array.isArray(data.disponibilidad)) {
+      throw new Error(data.message || 'Respuesta de disponibilidad no válida');
+    }
+
+    const horas = data.disponibilidad
+      .map(slot => String(slot.hora || '').slice(0, 5))
+      .filter(Boolean);
+
+    horasDisponiblesFecha = horas;
+    prepararSelectorHora(horas.length ? 'Selecciona una hora' : 'No hay horarios disponibles', horas);
+  } catch (err) {
+    if (peticion !== peticionDisponibilidadActual) return;
+    console.error('No se pudo cargar disponibilidad', err);
+    prepararSelectorHora('No se pudieron cargar los horarios');
+  }
 }
 
 if (reservaForm) {
@@ -261,9 +266,7 @@ if (reservaForm) {
       return;
     }
 
-    const diaSemana = new Date(formData.fecha_reserva).getDay();
-    const horasDisponibles = horasPorDia(diaSemana);
-    if (horasDisponibles.length && !horasDisponibles.includes(formData.hora_reserva)) {
+    if (!formData.hora_reserva || !horasDisponiblesFecha.includes(formData.hora_reserva)) {
       mostrarMensaje(messageDiv, 'Selecciona una hora disponible para ese día', 'error');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar Reserva';
@@ -285,11 +288,14 @@ if (reservaForm) {
       if (data.success) {
         mostrarMensaje(messageDiv, data.message || '¡Reserva enviada con éxito! Te contactaremos pronto.', 'success');
         reservaForm.reset();
-        
+        cargarHorasFecha('');
+
         // Scroll al mensaje
         messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         mostrarMensaje(messageDiv, data.message || 'Hubo un error al enviar la reserva', 'error');
+        // Refrescar horas por si el slot se ha ocupado mientras tanto
+        cargarHorasFecha(formData.fecha_reserva);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -433,15 +439,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fechaInput.addEventListener('change', function() {
       if (!validarFechaFutura(this.value)) {
         this.style.borderColor = '#c97d7d';
+        cargarHorasFecha('');
         alert('Por favor, selecciona una fecha futura');
       } else {
         this.style.borderColor = '';
-        actualizarHorasSegunDia();
+        cargarHorasFecha(this.value);
       }
     });
   }
-
-  cargarDisponibilidad();
 });
 
 // ========================================

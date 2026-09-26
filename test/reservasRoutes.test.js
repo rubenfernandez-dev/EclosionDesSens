@@ -18,10 +18,15 @@ test('el router público de reservas ya no expone DELETE /:id', () => {
   assert.doesNotMatch(codigoFuente, /router\.delete\s*\(/);
 });
 
-test('el router público conserva POST / y GET /disponibilidad*', () => {
+test('el router público conserva POST / y GET /disponibilidad/:fecha', () => {
   assert.match(codigoFuente, /router\.post\(\s*'\/'/);
-  assert.match(codigoFuente, /router\.get\(\s*'\/disponibilidad'/);
   assert.match(codigoFuente, /router\.get\(\s*'\/disponibilidad\/:fecha'/);
+});
+
+test('el router público ya no expone horarios semanales (GET /disponibilidad ni fecha IS NULL)', () => {
+  assert.doesNotMatch(codigoFuente, /router\.get\(\s*'\/disponibilidad'\s*,/);
+  // Como condición SQL (los comentarios pueden mencionarlo)
+  assert.doesNotMatch(codigoFuente, /(WHERE|AND|OR)\s+\(?\s*fecha IS NULL/i);
 });
 
 test('reservas.js no depende de disponibilidad_bloqueada (no existe en producción)', () => {
@@ -30,5 +35,5 @@ test('reservas.js no depende de disponibilidad_bloqueada (no existe en producci�
 
 test('POST / usa FOR UPDATE sobre disponibilidad dentro de una transacción', () => {
   assert.match(codigoFuente, /beginTransaction/);
-  assert.match(codigoFuente, /FROM disponibilidad WHERE hora = \? AND[\s\S]*FOR UPDATE/);
+  assert.match(codigoFuente, /FROM disponibilidad WHERE fecha = \? AND hora = \? AND disponible = 1 FOR UPDATE/);
 });

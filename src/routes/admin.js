@@ -5,6 +5,7 @@ const { rateLimit } = require('express-rate-limit');
 const router = express.Router();
 const db = require('../config/db');
 const { esEstadoValido, bloqueaHueco } = require('../utils/estadosReserva');
+const { esFechaValida } = require('../utils/reservasValidacion');
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
@@ -392,12 +393,11 @@ router.patch('/reservas/:id', requireAdmin, async (req, res) => {
       // concurrente sobre el mismo slot. La comprobación de conflicto en
       // `reservas` se hace DESPUÉS de adquirir ese lock, no antes.
       if (!bloqueabaAntes && bloqueaAhora) {
-        const diaSemana = new Date(reservaActual.fecha_reserva).getDay();
         const horaStr = String(reservaActual.hora_reserva).slice(0, 8);
 
         await connection.execute(
-          'SELECT id FROM disponibilidad WHERE hora = ? AND (fecha = ? OR (fecha IS NULL AND dia_semana = ?)) FOR UPDATE',
-          [horaStr, reservaActual.fecha_reserva, diaSemana]
+          'SELECT id FROM disponibilidad WHERE fecha = ? AND hora = ? FOR UPDATE',
+          [reservaActual.fecha_reserva, horaStr]
         );
 
         const [conflicto] = await connection.execute(
@@ -529,6 +529,15 @@ router.post(
         });
       }
 
+      // Solo existe disponibilidad por fecha concreta: no se admiten
+      // horarios semanales (fecha NULL).
+      if (!esFechaValida(fecha)) {
+        return res.status(400).json({
+          success: false,
+          message: 'fecha es obligatoria y debe tener formato YYYY-MM-DD'
+        });
+      }
+
       const dia = Number(dia_semana);
 
       if (
@@ -554,8 +563,6 @@ router.post(
             ? 1
             : 0;
 
-      const fechaSql = fecha || null;
-
       try {
         await db.execute(
           `INSERT INTO disponibilidad
@@ -563,7 +570,7 @@ router.post(
            VALUES (?, ?, ?, ?)`,
           [
             dia,
-            fechaSql,
+            fecha,
             horaSql,
             disponibleFlag
           ]

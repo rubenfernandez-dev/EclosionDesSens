@@ -21,6 +21,16 @@ test('PATCH /reservas/:id valida el estado contra la whitelist', () => {
 
 test('PATCH /reservas/:id bloquea disponibilidad y reservas dentro de una transacción al restaurar', () => {
   assert.match(codigoFuente, /beginTransaction/);
-  assert.match(codigoFuente, /FROM disponibilidad WHERE hora = \? AND[\s\S]*FOR UPDATE/);
+  // Mismo lock de fila (fecha+hora) que POST /api/reservas
+  assert.match(codigoFuente, /FROM disponibilidad WHERE fecha = \? AND hora = \? FOR UPDATE/);
   assert.match(codigoFuente, /estado != "cancelada" AND id != \?/);
+});
+
+test('admin.js no crea ni consulta horarios semanales (fecha IS NULL)', () => {
+  assert.doesNotMatch(codigoFuente, /(WHERE|AND|OR)\s+\(?\s*fecha IS NULL/i);
+  assert.doesNotMatch(codigoFuente, /fecha \|\| null/);
+});
+
+test('POST /disponibilidad exige una fecha válida', () => {
+  assert.match(codigoFuente, /if \(!esFechaValida\(fecha\)\)/);
 });

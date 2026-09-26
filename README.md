@@ -119,7 +119,6 @@ Base URL (local): http://localhost:4000
 Public:
 
 - POST /api/reservas
-- GET /api/reservas/disponibilidad
 - GET /api/reservas/disponibilidad/:fecha
 - POST /api/contacto
 

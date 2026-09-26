@@ -73,27 +73,22 @@ test('resolverDisponibilidad: sin filas no hay disponibilidad', () => {
   assert.equal(resolverDisponibilidad([], '04:30:00'), false);
 });
 
-test('resolverDisponibilidad: slot recurrente disponible', () => {
+test('resolverDisponibilidad: una fila semanal legacy (fecha NULL) nunca da disponibilidad', () => {
   const filas = [{ fecha: null, hora: '17:00:00', disponible: 1 }];
-  assert.equal(resolverDisponibilidad(filas, '17:00:00'), true);
-});
-
-test('resolverDisponibilidad: slot recurrente no disponible', () => {
-  const filas = [{ fecha: null, hora: '17:00:00', disponible: 0 }];
   assert.equal(resolverDisponibilidad(filas, '17:00:00'), false);
 });
 
-test('resolverDisponibilidad: excepción cierra un slot normalmente abierto', () => {
-  const filas = [
-    { fecha: null, hora: '17:00:00', disponible: 1 },
-    { fecha: new Date('2026-12-25'), hora: '17:00:00', disponible: 0 }
-  ];
-  assert.equal(resolverDisponibilidad(filas, '17:00:00'), false);
-});
-
-test('resolverDisponibilidad: excepción abre un slot que no existe en el recurrente', () => {
-  const filas = [
-    { fecha: new Date('2026-12-25'), hora: '11:00:00', disponible: 1 }
-  ];
+test('resolverDisponibilidad: slot con fecha concreta disponible', () => {
+  const filas = [{ fecha: new Date('2026-12-25'), hora: '11:00:00', disponible: 1 }];
   assert.equal(resolverDisponibilidad(filas, '11:00:00'), true);
+});
+
+test('resolverDisponibilidad: slot con fecha concreta no disponible', () => {
+  const filas = [{ fecha: new Date('2026-12-25'), hora: '11:00:00', disponible: 0 }];
+  assert.equal(resolverDisponibilidad(filas, '11:00:00'), false);
+});
+
+test('resolverDisponibilidad: la hora debe coincidir con el slot configurado', () => {
+  const filas = [{ fecha: new Date('2026-12-25'), hora: '11:00:00', disponible: 1 }];
+  assert.equal(resolverDisponibilidad(filas, '03:00:00'), false);
 });

@@ -8,6 +8,7 @@ const {
 const {
   esFechaValida,
   esFechaHoraFutura,
+  obtenerAhoraNegocio,
   esHoraValida,
   normalizarHora,
   esTipoMasajeValido,
@@ -18,15 +19,20 @@ const {
  * POST /api/reservas
  * Registrar nueva reserva.
  *
+ * Solo se puede reservar un slot configurado expresamente por el
+ * administrador para esa fecha concreta (fila de `disponibilidad` con
+ * fecha = fecha_reserva, hora = hora_reserva y disponible = 1). Las filas
+ * antiguas con `fecha IS NULL` (horarios semanales) no tienen ningún efecto.
+ *
  * `reservas` es la única fuente de verdad sobre qué huecos están ocupados
  * (no existe `disponibilidad_bloqueada` en producción). Para evitar dobles
  * reservas por concurrencia, toda la comprobación de disponibilidad y de
- * conflicto ocurre DENTRO de una única transacción: primero se bloquean con
- * `SELECT ... FOR UPDATE` las filas de `disponibilidad` relevantes para esa
- * fecha+hora (excepción puntual y/o slot recurrente); solo tras adquirir ese
- * lock se comprueba `reservas` en busca de conflicto e inserta. Dos requests
- * simultáneos para el mismo slot compiten por el mismo lock de fila de
- * `disponibilidad`, así que se serializan y solo uno puede terminar en 201.
+ * conflicto ocurre DENTRO de una única transacción: primero se bloquea con
+ * `SELECT ... FOR UPDATE` la fila de `disponibilidad` de esa fecha+hora;
+ * solo tras adquirir ese lock se comprueba `reservas` en busca de conflicto
+ * e inserta. Dos requests simultáneos para el mismo slot compiten por el
+ * mismo lock de fila de `disponibilidad`, así que se serializan y solo uno
+ * puede terminar en 201.
  */
 router.post('/', async (req, res) => {
   const { nombre, telefono, email, fecha_reserva, hora_reserva, tipo_masaje, mensaje, idioma } = req.body;
@@ -78,20 +84,17 @@ router.post('/', async (req, res) => {
     });
   }
 
-  const diaSemana = new Date(`${fecha_reserva}T00:00:00`).getDay();
-
   const connection = await db.getConnection();
   let insertId;
   try {
     await connection.beginTransaction();
 
-    // 1) Bloquear (FOR UPDATE) las filas de disponibilidad relevantes para
-    //    esta fecha+hora exacta: la excepción puntual (si existe) y/o el
-    //    slot recurrente del mismo día de semana. Esto es lo que serializa
-    //    a dos requests concurrentes sobre el mismo slot.
+    // 1) Bloquear (FOR UPDATE) la fila de disponibilidad de esta fecha+hora
+    //    exacta. Esto es lo que serializa a dos requests concurrentes sobre
+    //    el mismo slot.
     const [filasDisponibilidad] = await connection.execute(
-      'SELECT fecha, hora, disponible FROM disponibilidad WHERE hora = ? AND (fecha = ? OR (fecha IS NULL AND dia_semana = ?)) FOR UPDATE',
-      [horaNormalizada, fecha_reserva, diaSemana]
+      'SELECT fecha, hora, disponible FROM disponibilidad WHERE fecha = ? AND hora = ? AND disponible = 1 FOR UPDATE',
+      [fecha_reserva, horaNormalizada]
     );
 
     if (!resolverDisponibilidad(filasDisponibilidad, horaNormalizada)) {
@@ -171,30 +174,13 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * GET /api/reservas/disponibilidad
- * Lista de horarios recurrentes (público)
- */
-router.get('/disponibilidad', async (_req, res) => {
-  try {
-    const [rows] = await db.execute(
-      'SELECT dia_semana, hora, disponible FROM disponibilidad WHERE fecha IS NULL ORDER BY dia_semana ASC, hora ASC'
-    );
-
-    res.json({ success: true, disponibilidad: rows });
-  } catch (error) {
-    console.error('❌ Error al obtener disponibilidad:', error);
-    res.status(500).json({
-      success: false,
-      message: 'No se pudo obtener la disponibilidad'
-    });
-  }
-});
-
-/**
  * GET /api/reservas/disponibilidad/:fecha
- * Horarios disponibles para una fecha específica: slots abiertos según
- * disponibilidad (excepción puntual > recurrente) menos los ya ocupados por
- * una reserva activa en `reservas` (estado != 'cancelada').
+ * Horarios disponibles para una fecha específica: únicamente los slots
+ * configurados para esa fecha (disponible = 1) menos los ya ocupados por
+ * una reserva activa en `reservas` (estado != 'cancelada'). Sin
+ * configuración para la fecha, la lista es vacía. Solo se devuelven horas
+ * futuras según la hora del negocio (Europe/Zurich): hoy -> horas
+ * posteriores a la actual; fecha pasada -> lista vacía.
  */
 router.get('/disponibilidad/:fecha', async (req, res) => {
   try {
@@ -207,23 +193,12 @@ router.get('/disponibilidad/:fecha', async (req, res) => {
       });
     }
 
-    const diaSemana = new Date(`${fecha}T00:00:00`).getDay();
-
-    // Slots recurrentes del día de la semana + excepciones específicas de esta fecha
     const [slots] = await db.execute(
-      'SELECT fecha, hora, disponible FROM disponibilidad WHERE fecha = ? OR (fecha IS NULL AND dia_semana = ?)',
-      [fecha, diaSemana]
+      'SELECT hora FROM disponibilidad WHERE fecha = ? AND disponible = 1',
+      [fecha]
     );
 
-    const efectivos = new Map();
-    slots
-      .filter(s => s.fecha === null)
-      .forEach(s => efectivos.set(String(s.hora).slice(0, 8), !!s.disponible));
-    slots
-      .filter(s => s.fecha !== null)
-      .forEach(s => efectivos.set(String(s.hora).slice(0, 8), !!s.disponible)); // la excepción prevalece
-
-    const horasAbiertas = [...efectivos.entries()].filter(([, abierto]) => abierto).map(([hora]) => hora);
+    const horasAbiertas = [...new Set(slots.map(s => String(s.hora).slice(0, 8)))];
 
     // Horas ya ocupadas: directamente contra reservas activas de esa fecha
     const [ocupadas] = await db.execute(
@@ -232,8 +207,10 @@ router.get('/disponibilidad/:fecha', async (req, res) => {
     );
 
     const horasOcupadas = new Set(ocupadas.map(r => String(r.hora_reserva).slice(0, 8)));
+    const ahora = obtenerAhoraNegocio();
     const horariosDisponibles = horasAbiertas
       .filter(h => !horasOcupadas.has(h))
+      .filter(h => esFechaHoraFutura(fecha, h, ahora))
       .sort()
       .map(hora => ({ hora: hora.slice(0, 5) }));
 
