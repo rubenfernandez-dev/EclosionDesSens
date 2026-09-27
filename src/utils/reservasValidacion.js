@@ -89,9 +89,61 @@ function resolverDisponibilidad(filas, horaNormalizada) {
   );
 }
 
+// Rango máximo (en días, ambos extremos incluidos) aceptado por
+// GET /api/reservas/fechas-disponibles. El calendario pide un mes cada vez.
+const MAX_DIAS_RANGO_FECHAS = 62;
+
+/**
+ * Número de días del rango [desde, hasta], ambos incluidos.
+ * Ambas fechas deben ser válidas ('YYYY-MM-DD').
+ */
+function diasEnRango(desde, hasta) {
+  const ms = new Date(`${hasta}T00:00:00Z`) - new Date(`${desde}T00:00:00Z`);
+  return Math.round(ms / 86400000) + 1;
+}
+
+// mysql2 devuelve las columnas DATE como Date (medianoche local del proceso)
+// salvo que la consulta ya las formatee como string.
+function normalizarFecha(fecha) {
+  if (fecha instanceof Date) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
+  }
+  return String(fecha).slice(0, 10);
+}
+
+/**
+ * Fechas con al menos un slot realmente reservable, sin repetir y ordenadas.
+ * Aplica las mismas reglas que GET /disponibilidad/:fecha, de modo que una
+ * fecha aparece aquí si y solo si ese endpoint devolvería alguna hora:
+ * - `slots`: filas de `disponibilidad` ({ fecha, hora }) ya filtradas por
+ *   fecha concreta en rango y disponible = 1; las de fecha NULL se ignoran;
+ * - `ocupadas`: reservas activas ({ fecha_reserva, hora_reserva });
+ * - solo cuentan horas futuras según `ahora` (Europe/Zurich).
+ */
+function calcularFechasDisponibles(slots, ocupadas, ahora = obtenerAhoraNegocio()) {
+  const clave = (fecha, hora) => `${normalizarFecha(fecha)} ${String(hora).slice(0, 8)}`;
+  const ocupadasSet = new Set(ocupadas.map(r => clave(r.fecha_reserva, r.hora_reserva)));
+  const fechas = new Set();
+
+  for (const s of slots) {
+    if (s.fecha === null || s.fecha === undefined) continue;
+    const fecha = normalizarFecha(s.fecha);
+    const hora = String(s.hora).slice(0, 8);
+    if (ocupadasSet.has(clave(fecha, hora))) continue;
+    if (!esFechaHoraFutura(fecha, hora, ahora)) continue;
+    fechas.add(fecha);
+  }
+
+  return [...fechas].sort();
+}
+
 module.exports = {
   TIPOS_MASAJE_VALIDOS,
   ZONA_HORARIA_NEGOCIO,
+  MAX_DIAS_RANGO_FECHAS,
+  diasEnRango,
+  calcularFechasDisponibles,
   esFechaValida,
   obtenerAhoraNegocio,
   esFechaHoraFutura,

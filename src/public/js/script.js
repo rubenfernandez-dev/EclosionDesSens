@@ -228,6 +228,122 @@ async function cargarHorasFecha(fecha) {
   }
 }
 
+// ========================================
+// CALENDARIO DE RESERVAS (Flatpickr)
+// ========================================
+// Solo se pueden elegir las fechas que devuelve
+// GET /api/reservas/fechas-disponibles; el resto de días quedan
+// deshabilitados. Las fechas se piden por mes y se guardan en caché. El
+// backend sigue siendo quien valida: aquí solo se pinta su respuesta.
+const fechasDisponiblesPorMes = new Map(); // 'YYYY-MM' -> ['YYYY-MM-DD', ...]
+const peticionesFechasMes = new Map(); // 'YYYY-MM' -> petición en curso
+const fechasHabilitadas = new Set();
+let calendarioReservas = null;
+let idiomaCalendario = null;
+
+const pad2 = n => String(n).padStart(2, '0');
+const formatearFechaLocal = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+// Acepta mesIndice fuera de 0-11 (p.ej. 12 -> enero del año siguiente)
+function claveMes(anio, mesIndice) {
+  const d = new Date(anio, mesIndice, 1);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+}
+
+function recalcularFechasHabilitadas() {
+  fechasHabilitadas.clear();
+  fechasDisponiblesPorMes.forEach(fechas => fechas.forEach(f => fechasHabilitadas.add(f)));
+  if (calendarioReservas) calendarioReservas.redraw();
+}
+
+/**
+ * Carga (una sola vez, salvo `forzar`) las fechas disponibles de un mes.
+ */
+function cargarFechasMes(clave, forzar = false) {
+  if (!forzar) {
+    if (fechasDisponiblesPorMes.has(clave)) return Promise.resolve();
+    if (peticionesFechasMes.has(clave)) return peticionesFechasMes.get(clave);
+  }
+
+  const [anio, mes] = clave.split('-').map(Number);
+  const desde = `${clave}-01`;
+  const hasta = `${clave}-${pad2(new Date(anio, mes, 0).getDate())}`;
+
+  const peticion = fetch(`/api/reservas/fechas-disponibles?desde=${desde}&hasta=${hasta}`)
+    .then(async res => {
+      const data = await res.json();
+      if (!res.ok || !data.success || !Array.isArray(data.fechas)) {
+        throw new Error(data.message || 'Respuesta de fechas disponibles no válida');
+      }
+      // Descarta respuestas superadas por una petición forzada posterior
+      if (peticionesFechasMes.get(clave) !== peticion) return;
+      fechasDisponiblesPorMes.set(clave, data.fechas);
+      recalcularFechasHabilitadas();
+    })
+    .catch(err => console.error('No se pudieron cargar las fechas disponibles', err))
+    .finally(() => {
+      if (peticionesFechasMes.get(clave) === peticion) peticionesFechasMes.delete(clave);
+    });
+
+  peticionesFechasMes.set(clave, peticion);
+  return peticion;
+}
+
+function cargarMesesVisibles(instancia) {
+  cargarFechasMes(claveMes(instancia.currentYear, instancia.currentMonth));
+  // Los primeros días del mes siguiente también se ven en la rejilla
+  cargarFechasMes(claveMes(instancia.currentYear, instancia.currentMonth + 1));
+}
+
+/**
+ * Vuelve a pedir el mes de `fecha` (p.ej. tras reservar su último slot) y,
+ * si la fecha seleccionada ya no está disponible, la deselecciona.
+ */
+async function refrescarFechasDisponibles(fecha) {
+  if (!fecha) return;
+  await cargarFechasMes(fecha.slice(0, 7), true);
+  if (calendarioReservas && calendarioReservas.input.value === fecha && !fechasHabilitadas.has(fecha)) {
+    calendarioReservas.clear();
+  }
+}
+
+/**
+ * Monta Flatpickr sobre #fecha_reserva (el input original sigue enviando
+ * YYYY-MM-DD). Se vuelve a crear al cambiar de idioma para traducir meses y
+ * días. Sin Flatpickr cargado, se mantiene el <input type="date"> nativo.
+ */
+function crearCalendarioReservas(fechaInput) {
+  if (typeof flatpickr !== 'function') return;
+
+  const idioma = document.documentElement.lang;
+  if (calendarioReservas && idioma === idiomaCalendario) {
+    // Mismo idioma pero las traducciones pueden haber llegado después:
+    // el campo visible copia el placeholder traducido del input original.
+    calendarioReservas.altInput.placeholder = fechaInput.placeholder;
+    return;
+  }
+  idiomaCalendario = idioma;
+
+  const valorActual = fechaInput.value;
+  if (calendarioReservas) calendarioReservas.destroy();
+
+  const hoy = new Date();
+  calendarioReservas = flatpickr(fechaInput, {
+    locale: flatpickr.l10ns[idioma] || 'default',
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'j F Y',
+    disableMobile: true,
+    // Impide navegar a meses pasados; los días concretos los decide `enable`
+    minDate: new Date(hoy.getFullYear(), hoy.getMonth(), 1),
+    defaultDate: valorActual || null,
+    enable: [fecha => fechasHabilitadas.has(formatearFechaLocal(fecha))],
+    onReady: (_fechas, _texto, instancia) => cargarMesesVisibles(instancia),
+    onMonthChange: (_fechas, _texto, instancia) => cargarMesesVisibles(instancia),
+    onYearChange: (_fechas, _texto, instancia) => cargarMesesVisibles(instancia)
+  });
+}
+
 if (reservaForm) {
   reservaForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -288,14 +404,18 @@ if (reservaForm) {
       if (data.success) {
         mostrarMensaje(messageDiv, data.message || '¡Reserva enviada con éxito! Te contactaremos pronto.', 'success');
         reservaForm.reset();
+        if (calendarioReservas) calendarioReservas.clear(false);
         cargarHorasFecha('');
+        // Si era el último slot del día, la fecha deja de ser seleccionable
+        refrescarFechasDisponibles(formData.fecha_reserva);
 
         // Scroll al mensaje
         messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         mostrarMensaje(messageDiv, data.message || 'Hubo un error al enviar la reserva', 'error');
-        // Refrescar horas por si el slot se ha ocupado mientras tanto
+        // Refrescar horas y fechas por si el slot se ha ocupado mientras tanto
         cargarHorasFecha(formData.fecha_reserva);
+        refrescarFechasDisponibles(formData.fecha_reserva);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -437,6 +557,12 @@ document.addEventListener('DOMContentLoaded', () => {
     fechaInput.setAttribute('min', hoy);
 
     fechaInput.addEventListener('change', function() {
+      // Flatpickr emite 'change' con valor vacío al deseleccionar
+      if (!this.value) {
+        this.style.borderColor = '';
+        cargarHorasFecha('');
+        return;
+      }
       if (!validarFechaFutura(this.value)) {
         this.style.borderColor = '#c97d7d';
         cargarHorasFecha('');
@@ -446,6 +572,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarHorasFecha(this.value);
       }
     });
+
+    crearCalendarioReservas(fechaInput);
+    // languageManager cambia <html lang> al aplicar un idioma: se recrea el
+    // calendario para traducir meses, días y el formato visible.
+    new MutationObserver(() => crearCalendarioReservas(fechaInput))
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
 });
 

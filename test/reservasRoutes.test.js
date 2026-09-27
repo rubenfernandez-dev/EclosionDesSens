@@ -23,6 +23,10 @@ test('el router público conserva POST / y GET /disponibilidad/:fecha', () => {
   assert.match(codigoFuente, /router\.get\(\s*'\/disponibilidad\/:fecha'/);
 });
 
+test('el router público expone GET /fechas-disponibles', () => {
+  assert.match(codigoFuente, /router\.get\(\s*'\/fechas-disponibles'/);
+});
+
 test('el router público ya no expone horarios semanales (GET /disponibilidad ni fecha IS NULL)', () => {
   assert.doesNotMatch(codigoFuente, /router\.get\(\s*'\/disponibilidad'\s*,/);
   // Como condición SQL (los comentarios pueden mencionarlo)

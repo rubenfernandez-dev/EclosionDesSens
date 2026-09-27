@@ -9,7 +9,7 @@ const express = require('express');
 // el router.
 //
 // La BD falsa evalúa las condiciones reales del WHERE (solo `col = ?`,
-// `col = 1` y `col != "valor"` unidas por AND). Cualquier otra construcción
+// `col >= ?`, `col <= ?`, `col = 1` y `col != "valor"` unidas por AND). Cualquier otra construcción
 // (OR, IS NULL, paréntesis...) lanza error: así un fallback a horarios
 // semanales en las consultas haría fallar los tests.
 
@@ -25,6 +25,13 @@ function evaluarWhere(sql, params) {
   let i = 0;
   const condiciones = clausula.split(/\s+AND\s+/i).map(cond => {
     let m;
+    if ((m = cond.match(/^(\w+)\s*(>=|<=)\s*\?$/))) {
+      const [, columna, operador] = m;
+      const valor = String(params[i++]);
+      // Como en SQL, una comparación con NULL nunca es cierta.
+      return fila => fila[columna] !== null && fila[columna] !== undefined &&
+        (operador === '>=' ? String(fila[columna]) >= valor : String(fila[columna]) <= valor);
+    }
     if ((m = cond.match(/^(\w+)\s*=\s*\?$/))) {
       const valor = params[i++];
       return fila => String(fila[m[1]]) === String(valor);
@@ -85,6 +92,11 @@ let servidor;
 let baseUrl;
 
 test.before(async () => {
+  // El router registra cada reserva con console.log. Bajo `node --test` esa
+  // salida comparte stdout con el canal serializado del runner y puede
+  // corromperlo ("Unable to deserialize cloned data"), así que se silencia.
+  test.mock.method(console, 'log', () => {});
+
   const app = express();
   app.use(express.json());
   app.use('/api/reservas', reservasRouter);
@@ -241,4 +253,159 @@ test('GET /disponibilidad/:fecha usa el día de Zúrich, no el de UTC', async ()
   ];
   assert.deepEqual(await horasConAhora('2026-09-26T22:30:00Z', slots, '2026-09-26'), []);
   assert.deepEqual(await horasConAhora('2026-09-26T22:30:00Z', slots, '2026-09-27'), ['09:00']);
+});
+
+// ----------------------------------------------------------------------
+// GET /fechas-disponibles?desde=&hasta=
+// ----------------------------------------------------------------------
+
+// "Ahora" fijo para estos tests: 2026-09-26 10:00 UTC = 12:00 en Zúrich.
+const AHORA_UTC = '2026-09-26T10:00:00Z';
+
+async function fechasConAhora(instanteUtc, desde, hasta, { slots, reservas = [] }) {
+  estado.disponibilidad = slots;
+  estado.reservas = reservas;
+  test.mock.timers.enable({ apis: ['Date'], now: new Date(instanteUtc) });
+  try {
+    const res = await fetch(`${baseUrl}/fechas-disponibles?desde=${desde}&hasta=${hasta}`);
+    const data = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(data.success, true);
+    return data.fechas;
+  } finally {
+    test.mock.timers.reset();
+  }
+}
+
+const reservaActiva = (fecha_reserva, hora_reserva, estadoReserva = 'confirmada') =>
+  ({ fecha_reserva, hora_reserva, estado: estadoReserva });
+
+test('GET /fechas-disponibles: fecha con una hora libre -> aparece', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-10-31', {
+    slots: [slot(1, '2026-10-03', '10:00:00'), slot(2, '2026-10-03', '11:00:00')],
+    reservas: [reservaActiva('2026-10-03', '10:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-10-03']);
+});
+
+test('GET /fechas-disponibles: fecha sin disponibilidad -> no aparece', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-10-31', {
+    slots: [
+      slot(1, '2026-10-03', '10:00:00'),
+      { id: 2, dia_semana: 0, fecha: '2026-10-08', hora: '10:00:00', disponible: 0 },
+      // Fila semanal legacy: nunca da disponibilidad
+      { id: 3, dia_semana: 3, fecha: null, hora: '10:00:00', disponible: 1 }
+    ]
+  });
+  assert.deepEqual(fechas, ['2026-10-03']);
+});
+
+test('GET /fechas-disponibles: fecha con todos los slots ocupados -> no aparece', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-10-31', {
+    slots: [
+      slot(1, '2026-10-08', '10:00:00'),
+      slot(2, '2026-10-08', '11:00:00'),
+      slot(3, '2026-10-14', '10:00:00')
+    ],
+    reservas: [
+      reservaActiva('2026-10-08', '10:00:00'),
+      reservaActiva('2026-10-08', '11:00:00', 'pendiente'),
+      // Una reserva cancelada no ocupa el slot
+      reservaActiva('2026-10-14', '10:00:00', 'cancelada')
+    ]
+  });
+  assert.deepEqual(fechas, ['2026-10-14']);
+});
+
+test('GET /fechas-disponibles: fecha pasada -> no aparece', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-09-01', '2026-09-30', {
+    slots: [slot(1, '2026-09-25', '15:00:00'), slot(2, '2026-09-28', '15:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-09-28']);
+});
+
+test('GET /fechas-disponibles: rango completamente pasado -> lista vacía', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-08-01', '2026-08-31', {
+    slots: [slot(1, '2026-08-10', '15:00:00')]
+  });
+  assert.deepEqual(fechas, []);
+});
+
+test('GET /fechas-disponibles: hoy con todas las horas pasadas -> no aparece', async () => {
+  // 12:00 en Zúrich: 11:00 pasada y 12:00 no es posterior
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-09-26', '2026-09-30', {
+    slots: [slot(1, '2026-09-26', '11:00:00'), slot(2, '2026-09-26', '12:00:00')]
+  });
+  assert.deepEqual(fechas, []);
+});
+
+test('GET /fechas-disponibles: hoy con una hora futura -> aparece', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-09-26', '2026-09-30', {
+    slots: [slot(1, '2026-09-26', '11:00:00'), slot(2, '2026-09-26', '13:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-09-26']);
+});
+
+test('GET /fechas-disponibles: fecha futura con varios slots -> aparece una única vez', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-10-31', {
+    slots: [
+      slot(1, '2026-10-14', '18:00:00'),
+      slot(2, '2026-10-03', '10:00:00'),
+      slot(3, '2026-10-14', '09:00:00'),
+      slot(4, '2026-10-14', '12:00:00')
+    ]
+  });
+  assert.deepEqual(fechas, ['2026-10-03', '2026-10-14']);
+});
+
+test('GET /fechas-disponibles: excluye fechas fuera del rango pedido', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-10-31', {
+    slots: [slot(1, '2026-09-30', '10:00:00'), slot(2, '2026-10-31', '10:00:00'), slot(3, '2026-11-01', '10:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-10-31']);
+});
+
+test('GET /fechas-disponibles: usa el día de Zúrich, no el de UTC', async () => {
+  // 2026-09-26 22:30 UTC = 2026-09-27 00:30 en Zúrich: el 26 ya es pasado
+  const fechas = await fechasConAhora('2026-09-26T22:30:00Z', '2026-09-26', '2026-09-30', {
+    slots: [slot(1, '2026-09-26', '23:00:00'), slot(2, '2026-09-27', '00:00:00'), slot(3, '2026-09-27', '09:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-09-27']);
+});
+
+test('GET /fechas-disponibles: parámetros inválidos -> 400', async () => {
+  const casos = [
+    '',
+    '?desde=2026-10-01',
+    '?hasta=2026-10-31',
+    '?desde=2026-10-01&hasta=2026-02-30',
+    '?desde=01-10-2026&hasta=2026-10-31',
+    '?desde=2026-10-31&hasta=2026-10-01',
+    '?desde=2026-10-01&desde=2026-10-02&hasta=2026-10-31',
+    // 63 días: supera el máximo
+    '?desde=2026-10-01&hasta=2026-12-02'
+  ];
+  for (const query of casos) {
+    const res = await fetch(`${baseUrl}/fechas-disponibles${query}`);
+    assert.equal(res.status, 400, `se esperaba 400 para "${query}"`);
+    assert.equal((await res.json()).success, false);
+  }
+});
+
+test('GET /fechas-disponibles: acepta el rango máximo de 62 días', async () => {
+  const fechas = await fechasConAhora(AHORA_UTC, '2026-10-01', '2026-12-01', {
+    slots: [slot(1, '2026-12-01', '10:00:00')]
+  });
+  assert.deepEqual(fechas, ['2026-12-01']);
+});
+
+test('GET /fechas-disponibles: tras reservar el último slot del día, la fecha desaparece', async () => {
+  const slots = [slot(1, '2099-10-03', '10:00:00')];
+  assert.deepEqual(await fechasConAhora(AHORA_UTC, '2099-10-01', '2099-10-31', { slots }), ['2099-10-03']);
+
+  const res = await reservar('2099-10-03', '10:00');
+  assert.equal(res.status, 201);
+
+  const reservas = estado.reservas;
+  assert.deepEqual(await fechasConAhora(AHORA_UTC, '2099-10-01', '2099-10-31', { slots, reservas }), []);
 });

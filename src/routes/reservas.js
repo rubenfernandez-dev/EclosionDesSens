@@ -12,7 +12,10 @@ const {
   esHoraValida,
   normalizarHora,
   esTipoMasajeValido,
-  resolverDisponibilidad
+  resolverDisponibilidad,
+  MAX_DIAS_RANGO_FECHAS,
+  diasEnRango,
+  calcularFechasDisponibles
 } = require('../utils/reservasValidacion');
 
 /**
@@ -220,6 +223,61 @@ router.get('/disponibilidad/:fecha', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'No se pudo obtener la disponibilidad'
+    });
+  }
+});
+
+/**
+ * GET /api/reservas/fechas-disponibles?desde=YYYY-MM-DD&hasta=YYYY-MM-DD
+ * Fechas del rango (ambos extremos incluidos, máx. MAX_DIAS_RANGO_FECHAS
+ * días) con al menos un slot reservable según las mismas reglas que
+ * GET /disponibilidad/:fecha: configurado para esa fecha (disponible = 1),
+ * sin reserva activa y futuro en hora de negocio (Europe/Zurich).
+ *
+ * Siempre dos consultas por petición, independientemente de los días del
+ * rango. La comparación por rango de `fecha` excluye por sí sola las filas
+ * semanales legacy con fecha NULL.
+ */
+router.get('/fechas-disponibles', async (req, res) => {
+  try {
+    const { desde, hasta } = req.query;
+
+    if (!esFechaValida(desde) || !esFechaValida(hasta) || desde > hasta) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rango de fechas no válido'
+      });
+    }
+
+    if (diasEnRango(desde, hasta) > MAX_DIAS_RANGO_FECHAS) {
+      return res.status(400).json({
+        success: false,
+        message: `El rango de fechas no puede superar ${MAX_DIAS_RANGO_FECHAS} días`
+      });
+    }
+
+    const ahora = obtenerAhoraNegocio();
+    const inicio = desde < ahora.fecha ? ahora.fecha : desde;
+    if (inicio > hasta) {
+      return res.json({ success: true, fechas: [] });
+    }
+
+    const [slots] = await db.execute(
+      "SELECT DATE_FORMAT(fecha, '%Y-%m-%d') AS fecha, hora FROM disponibilidad WHERE fecha >= ? AND fecha <= ? AND disponible = 1",
+      [inicio, hasta]
+    );
+
+    const [ocupadas] = await db.execute(
+      "SELECT DATE_FORMAT(fecha_reserva, '%Y-%m-%d') AS fecha_reserva, hora_reserva FROM reservas WHERE fecha_reserva >= ? AND fecha_reserva <= ? AND estado != 'cancelada'",
+      [inicio, hasta]
+    );
+
+    res.json({ success: true, fechas: calcularFechasDisponibles(slots, ocupadas, ahora) });
+  } catch (error) {
+    console.error('❌ Error al obtener fechas disponibles:', error);
+    res.status(500).json({
+      success: false,
+      message: 'No se pudieron obtener las fechas disponibles'
     });
   }
 });

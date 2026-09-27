@@ -1236,6 +1236,80 @@ p {
   min-height: 120px;
 }
 
+/* Calendario de reservas (Flatpickr): solo son seleccionables los días
+   con horas disponibles; el resto se muestran en gris. */
+.form-group input.flatpickr-input + input[readonly] {
+  cursor: pointer;
+}
+
+.flatpickr-calendar {
+  font-family: var(--font-body);
+}
+
+/* Anula, solo dentro del calendario, los estilos globales de input/select
+   del formulario (padding, borde, ancho), que deforman la cabecera del mes. */
+.flatpickr-calendar .flatpickr-current-month input.cur-year,
+.flatpickr-calendar .flatpickr-current-month input.cur-year:focus {
+  padding: 0 0 0 0.5ch;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: inherit;
+  height: auto;
+}
+
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months:focus {
+  padding: 0 0 0 0.5ch;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: inherit;
+  width: auto;
+}
+
+.flatpickr-day {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.flatpickr-day.prevMonthDay:not(.flatpickr-disabled),
+.flatpickr-day.nextMonthDay:not(.flatpickr-disabled) {
+  color: var(--color-text);
+}
+
+.flatpickr-day:not(.flatpickr-disabled):not(.selected):hover,
+.flatpickr-day:not(.flatpickr-disabled):not(.selected):focus {
+  background: var(--color-beige);
+  border-color: var(--color-beige);
+}
+
+.flatpickr-day.today:not(.selected) {
+  border-color: var(--color-primary-light);
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+  color: #c4bcb4;
+  font-weight: 400;
+  background: transparent;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected:focus {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--color-primary);
+}
+
 .form-actions {
   margin-top: var(--spacing-sm);
 }
